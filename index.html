@@ -2735,8 +2735,7 @@ function renderRoomAR(id){
         <div style="font-size:12.5px;max-width:320px;text-align:center">Use your phone's live camera for the quickest preview, or upload a photo of the space — e.g. the wall or floor area where you'd place ${cats(p.cat).toLowerCase()}.</div>
         <button class="btn accent sm" onclick="startRoomCamera('${p.id}')">🎥 Use Live Camera</button>
         <div style="font-size:11px;color:var(--muted)">— or —</div>
-        <input type="file" accept="image/*" onchange="handleRoomPhotoUpload(event,'${p.id}')">
-      </div>
+        <label class="btn secondary sm" style="display:inline-block;cursor:pointer">📁 Upload Photo<input type="file" accept="image/*" capture="environment" onchange="handleRoomPhotoUpload(event,'${p.id}')" style="display:none"></label>      </div>
     ` : showCamera ? `
       <div class="room-stage" id="roomStage">
         <video id="roomCameraVideo" autoplay playsinline muted></video>
@@ -3709,8 +3708,7 @@ function resumeBuilder(){
       <div style="text-align:center;flex:none">
         <img id="rbPhotoPreview" src="${resumeState.photo||''}" style="width:84px;height:84px;border-radius:50%;object-fit:cover;background:var(--surface-2);border:1px solid var(--border);display:${resumeState.photo?'block':'none'}">
         <div id="rbPhotoPlaceholder" style="width:84px;height:84px;border-radius:50%;background:var(--surface-2);border:1px dashed var(--border);display:${resumeState.photo?'none':'flex'};align-items:center;justify-content:center;font-size:10.5px;color:var(--text-secondary);text-align:center;padding:4px">No Photo</div>
-        <label class="btn secondary sm" style="margin-top:8px;display:inline-block;cursor:pointer">Upload Photo<input type="file" accept="image/*" style="display:none" onchange="handleResumePhoto(event)"></label>
-      </div>
+      <label class="btn secondary sm" style="margin-top:8px;display:inline-block;cursor:pointer">📷 Take a Photo<input type="file" accept="image/*" capture="environment" style="display:none" onchange="handleResumePhoto(event)"></label>      </div>
       <div class="grid" style="grid-template-columns:1fr 1fr;gap:12px;flex:1;min-width:280px">
         <div><label>Full Name</label><input id="rbName" type="text" placeholder="Jane Doe"></div>
         <div><label>Target Role</label><input id="rbRole" type="text" placeholder="Frontend Developer"></div>
