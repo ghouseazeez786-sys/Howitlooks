@@ -2010,8 +2010,7 @@ function renderProduct(id){
     <div>
       <h2>${p.name}</h2>
       <div>⭐ ${p.rating} · ${cats(p.cat)}</div>
-      <div class="price" style="font-size:24px;margin:10px 0">${fmt(p.price)} <span class="mrp">${fmt(p.mrp)}</span></div>
-      <div class="btnrow">
+      <div class="price" style="font-size:24px;margin:10px 0">${fmt(p.price)} <span class="mrp" style="color:var(--muted);text-decoration:line-through;font-size:14px;margin-left:10px">${fmt(p.mrp)}</span></div>    <div class="btnrow">
         <button class="btn" onclick="addToCart('${p.id}')">🛒 Add to Cart</button>
         <button class="btn accent" onclick="location.hash='#/price/${p.id}'">💰 Compare Prices</button>
       </div>
