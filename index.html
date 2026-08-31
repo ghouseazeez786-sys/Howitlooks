@@ -3218,14 +3218,14 @@ function switchTab(btn, containerId, tab){
 // the currently-applied location so it survives re-renders (e.g. switching
 // tabs), and "Show All India" just clears it back to ''.
 if(typeof state !== 'undefined' && state.jobLocFilter === undefined) state.jobLocFilter = 'Bengaluru';
+function isJobOpen(j){ return new Date(j.deadline) >= new Date(new Date().toDateString()); }
 function renderJobs(){
   const defaultLoc = state.jobLocFilter || '';
-  const preFiltered = defaultLoc ? JOBS.filter(j=>j.loc===defaultLoc || j.loc==='Remote' || j.loc==='Multiple') : JOBS;
-  return `
+  const OPEN_JOBS = JOBS.filter(isJobOpen);
+  const preFiltered = defaultLoc ? OPEN_JOBS.filter(j=>j.loc===defaultLoc || j.loc==='Remote' || j.loc==='Multiple') : OPEN_JOBS;  return `
   <div class="card" style="padding:18px;background:linear-gradient(120deg,var(--violet),var(--magenta));color:#fff">
-    <h2 style="margin:0 0 4px">💼 Jobs — Government &amp; Private</h2>
-    <div style="font-size:13px;opacity:.92">${JOBS.length} listings across India${defaultLoc ? ` — showing ${defaultLoc} first` : ''}. Pick a role, skill and location to find jobs that match you.</div>
-  </div>
+  <h2 style="margin:0 0 4px">💼 Jobs — Government &amp; Private</h2>
+  <div style="font-size:13px;opacity:.92">${OPEN_JOBS.length} listings across India${defaultLoc ? ` — showing ${defaultLoc} first` : ''}. Pick a role, skill and location to find jobs that match you.</div>
   <div class="card" style="padding:16px;margin-top:14px;background:linear-gradient(160deg,color-mix(in srgb,var(--violet) 10%,var(--surface)),color-mix(in srgb,var(--magenta) 10%,var(--surface)))">
     <b style="font-size:13px">🔍 Find jobs matching your profile</b>
     <div class="grid filter-grid" style="grid-template-columns:1fr 1fr 1fr auto;gap:10px;margin-top:10px">
@@ -3279,14 +3279,14 @@ function jobList(list){
       <div style="font-size:12px;margin-top:6px;color:var(--critical)">Apply before ${j.deadline}</div>
       <button class="btn sm block" style="margin-top:8px" onclick="flashToast('Opening official application link (demo)')">Apply →</button>
     </div>`).join('')}
-  </div>`;
+    </div>`;
 }
 function findJobs(){
   const role = document.getElementById('jobRole').value.trim().toLowerCase();
   const skill = document.getElementById('jobSkill').value.trim().toLowerCase();
   const loc = document.getElementById('jobLoc').value.trim();
   state.jobLocFilter = loc; // remember the choice so it sticks across re-renders
-  let list = JOBS;
+  let list = JOBS.filter(isJobOpen);
   if(role) list = list.filter(j => j.title.toLowerCase() === role);
   if(skill) list = list.filter(j => j.title.toLowerCase().includes(skill) || (j.skills||[]).some(s=>s.toLowerCase().includes(skill)));
   if(loc) list = list.filter(j => j.loc === loc || j.loc==='Remote' || j.loc==='Multiple');
