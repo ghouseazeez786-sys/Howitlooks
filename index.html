@@ -977,12 +977,12 @@ const JOB_ROLES = [...new Set(JOBS.map(j=>j.title))].sort();
 function titleCaseWords(str){ return str.replace(/\b\w/g, c=>c.toUpperCase()); }
 const PLANS = [
   {name:'Free', price:0, period:'forever', features:['Basic AI preview (3/month)','Price comparison','Hospital & job search','Ads supported'], highlight:false},
-  {name:'Starter', price:200, period:'month', features:['10 AI previews / month','AR try-on (limited)','No ads','Priority support'], highlight:false},
-  {name:'Premium', price:299, period:'month', features:['Unlimited AI previews','Full AR try-on & 3D room placement','AI-personalized recommendations','Price-drop alerts & watchlist','Resume builder Pro'], highlight:true},
-  {name:'Family', price:499, period:'month', features:['Everything in Premium','Up to 5 family members','Shared wishlist & cart','Family health locker'], highlight:false},
+  {name:'Starter', price:100, period:'month', features:['10 AI previews / month','AR try-on (limited)','No ads','Priority support'], highlight:false},
+  {name:'Premium', price:250, period:'month', features:['Unlimited AI previews','Full AR try-on & 3D room placement','AI-personalized recommendations','Price-drop alerts & watchlist','Resume builder Pro'], highlight:true},
+  {name:'Family', price:400, period:'month', features:['Everything in Premium','Up to 5 family members','Shared wishlist & cart','Family health locker'], highlight:false},
   {name:'Business', price:1499, period:'month', features:['Team accounts (10 seats)','Bulk price comparison API','Affiliate analytics export','Dedicated account manager'], highlight:false},
 ];
-const AFFILIATE_ADMIN = [
+  const AFFILIATE_ADMIN = [
   {name:'Amazon', enabled:true, clicks:18420}, {name:'Flipkart', enabled:true, clicks:15230},
   {name:'Myntra', enabled:true, clicks:9120}, {name:'Meesho', enabled:false, clicks:0},
   {name:'Snapdeal', enabled:true, clicks:4110}, {name:'Ajio', enabled:true, clicks:6720},
@@ -2371,10 +2371,7 @@ function renderResultTabs(){
   const plan = currentPlanName();
   const shown = ANGLES.slice(0, limit);
   const locked = ANGLES.slice(limit);
-  const planPrice = { Starter:200, Premium:299, Family:499, Business:1499 };
-  const upgradeBoxHtml = locked.length ? `<div class="card" style="padding:14px;margin-top:14px;background:linear-gradient(120deg,var(--accent),var(--yellow));color:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
-    <div><b>🔓 Unlock ${locked.length} more angle${locked.length===1?'':'s'}</b><div style="font-size:12px;font-weight:700;opacity:1">Upgrade to ${nextTierUp(limit)} (₹${planPrice[nextTierUp(limit)]}/mo) to see up to ${PLAN_ANGLE_LIMITS[nextTierUp(limit)]} angles — Starter ₹200/mo: 10 angles · Premium ₹299/mo: 15 angles · Family/Business: 20.</div></div>
-    <button class="btn" style="background:#fff;color:var(--accent-dark)" onclick="goTo('#/premium')">Upgrade →</button>
+  const planPrice = { Starter:100, Premium:250, Family:400, Business:1499 };  const upgradeBoxHtml = locked.length ? `<div class="card" style="padding:14px;margin-top:14px;background:linear-gradient(120deg,var(--accent),var(--yellow));color:#fff;display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap">
   </div>` : '';
   const angleGridHtml = `<div class="angle-grid">
     ${shown.map((a,i)=>`<div class="angle-cell" onclick="openAngleZoom(${i})"><img src="${state.uploadedImage}" style="${a.css}"><span>${a.label}</span></div>`).join('')}
