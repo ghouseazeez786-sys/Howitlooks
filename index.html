@@ -3217,28 +3217,30 @@ function switchTab(btn, containerId, tab){
 // the currently-applied location so it survives re-renders (e.g. switching
 // tabs), and "Show All India" just clears it back to ''.
 if(typeof state !== 'undefined' && state.jobLocFilter === undefined) state.jobLocFilter = 'Bengaluru';
-function isJobOpen(j){ return new Date(j.deadline) >= new Date(new Date().toDateString()); }
+const ADZUNA_APP_ID = 'a22cddbc';
+const ADZUNA_APP_KEY = 'cddb66c8c34ee24271aba141cf159e31';
+const JOB_LOCATIONS_LIVE = ['Bengaluru','Mumbai','Delhi','Hyderabad','Chennai','Pune','Kolkata','Ahmedabad','Jaipur','Lucknow','Remote'];
+let jobsLoadToken = 0;
+function adzunaSalary(j){
+  if(!j.salary_min && !j.salary_max) return '';
+  const toLPA = n => (n/100000).toFixed(1)+' LPA';
+  if(j.salary_min && j.salary_max && j.salary_min!==j.salary_max) return `₹${toLPA(j.salary_min)}–${toLPA(j.salary_max)}`;
+  return `₹${toLPA(j.salary_min||j.salary_max)}`;
+}
 function renderJobs(){
   const defaultLoc = state.jobLocFilter || '';
-  const OPEN_JOBS = JOBS.filter(isJobOpen);
-  const preFiltered = defaultLoc ? OPEN_JOBS.filter(j=>j.loc===defaultLoc || j.loc==='Remote' || j.loc==='Multiple') : OPEN_JOBS;  return `
+  return `
   <div class="card" style="padding:18px;background:linear-gradient(120deg,var(--violet),var(--magenta));color:#fff">
-  <h2 style="margin:0 0 4px">💼 Jobs — Government &amp; Private</h2>
-  <div style="font-size:13px;opacity:.92">${OPEN_JOBS.length} listings across India${defaultLoc ? ` — showing ${defaultLoc} first` : ''}. Pick a role, skill and location to find jobs that match you.</div>
+    <h2 style="margin:0 0 4px">💼 Jobs — Live Listings (Government & Private)</h2>
+    <div style="font-size:13px;opacity:.92">Real, live job postings pulled from across India — updates automatically, no fixed list.${defaultLoc ? ` Showing ${defaultLoc} first.` : ''}</div>
+  </div>
   <div class="card" style="padding:16px;margin-top:14px;background:linear-gradient(160deg,color-mix(in srgb,var(--violet) 10%,var(--surface)),color-mix(in srgb,var(--magenta) 10%,var(--surface)))">
     <b style="font-size:13px">🔍 Find jobs matching your profile</b>
-    <div class="grid filter-grid" style="grid-template-columns:1fr 1fr 1fr auto;gap:10px;margin-top:10px">
-      <select id="jobRole">
-        <option value="">Any job role</option>
-        ${JOB_ROLES.map(r=>`<option value="${r}">${r}</option>`).join('')}
-      </select>
-      <select id="jobSkill">
-        <option value="">Any skill</option>
-        ${JOB_SKILLS.map(s=>`<option value="${s}">${titleCaseWords(s)}</option>`).join('')}
-      </select>
+    <div class="grid filter-grid" style="grid-template-columns:1fr 1fr auto;gap:10px;margin-top:10px">
+      <input id="jobKeyword" type="text" placeholder="Role or skill (e.g. developer, nurse, driver)" value="${state.jobKeyword||''}">
       <select id="jobLoc">
         <option value="">All India (any location)</option>
-        ${JOB_LOCATIONS.map(l=>`<option value="${l}" ${l===defaultLoc?'selected':''}>${l}</option>`).join('')}
+        ${JOB_LOCATIONS_LIVE.map(l=>`<option value="${l}" ${l===defaultLoc?'selected':''}>${l}</option>`).join('')}
       </select>
       <button class="btn block" onclick="findJobs()">Find My Jobs</button>
     </div>
@@ -3256,51 +3258,83 @@ function renderJobs(){
     <button class="btn sm" style="background:#fff;color:var(--accent-dark)" onclick="goTo('#/salary-calculator')">💰 Salary Calculator</button>
     <button class="btn sm" style="background:#fff;color:var(--accent-dark)" onclick="goTo('#/career-roadmap')">🗺️ Career Roadmap</button>
   </div>
-  <div class="tabs" style="margin-top:14px">
-    <button class="active" onclick="switchTab(this,'jobsTab','all')">All (${preFiltered.length})</button>
-    <button onclick="switchTab(this,'jobsTab','Government')">Government (${preFiltered.filter(j=>j.type==='Government').length})</button>
-    <button onclick="switchTab(this,'jobsTab','Private')">Private (${preFiltered.filter(j=>j.type==='Private').length})</button>
+  <div class="tabs" style="margin-top:14px" id="jobsTabButtons">
+    <button class="active" onclick="switchJobsTab(this,'all')">All</button>
+    <button onclick="switchJobsTab(this,'Government')">Government</button>
+    <button onclick="switchJobsTab(this,'Private')">Private</button>
   </div>
-  <div id="jobsTab">${jobList(preFiltered)}</div>
+  <div id="jobsTab"><div class="empty-state">Loading live jobs…</div></div>
   <div class="section-title"><h2>📝 Resume Builder</h2></div>
   ${resumeBuilder()}
   `;
 }
+function switchJobsTab(btn, type){
+  document.querySelectorAll('#jobsTabButtons button').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  state.jobsTabType = type;
+  loadLiveJobs();
+}
 function jobList(list){
-  if(!list.length) return `<div class="empty-state">No matching jobs yet — try a broader skill, role or location, or search Naukri / Foundit / Indeed above.</div>`;
+  if(!list.length) return `<div class="empty-state">No live listings matched right now — try a broader keyword, a different location, or search Naukri / Foundit / Indeed above.</div>`;
   return `<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(260px,1fr))">
     ${list.map(j=>`
     <div class="card" style="padding:14px">
-      <div style="display:flex;justify-content:space-between"><b>${j.title}</b><span class="pill" style="background:${j.type==='Government'?'var(--violet)':'var(--brand)'};color:#fff;border:none">${j.type}</span></div>
+      <div style="display:flex;justify-content:space-between"><b>${j.title}</b><span class="pill" style="background:${j.isGovt?'var(--violet)':'var(--brand)'};color:#fff;border:none">${j.isGovt?'Government':'Private'}</span></div>
       <div style="font-size:13px;color:var(--text-secondary);margin-top:6px">${j.org} · 📍 ${j.loc}</div>
       ${j.salary ? `<div style="font-size:12.5px;margin-top:4px;font-weight:700;color:var(--brand)">💰 ${j.salary}</div>` : ''}
-      <div style="font-size:11px;margin-top:6px;color:var(--muted)">Skills: ${(j.skills||[]).join(', ')}</div>
-      <div style="font-size:12px;margin-top:6px;color:var(--critical)">Apply before ${j.deadline}</div>
-      <button class="btn sm block" style="margin-top:8px" onclick="flashToast('Opening official application link (demo)')">Apply →</button>
+      <div style="font-size:11px;margin-top:6px;color:var(--muted)">Posted ${j.posted}</div>
+      <a class="btn sm block" style="margin-top:8px;display:block;text-align:center" href="${j.applyUrl}" target="_blank" rel="noopener">Apply →</a>
     </div>`).join('')}
-    </div>`;
+  </div>`;
+}
+async function loadLiveJobs(){
+  const myToken = ++jobsLoadToken;
+  const container = document.getElementById('jobsTab');
+  if(container) container.innerHTML = `<div class="empty-state">Loading live jobs…</div>`;
+  const keyword = (document.getElementById('jobKeyword')||{}).value || '';
+  const loc = (document.getElementById('jobLoc')||{}).value || state.jobLocFilter || '';
+  state.jobKeyword = keyword;
+  state.jobLocFilter = loc;
+  const tabType = state.jobsTabType || 'all';
+  const params = new URLSearchParams({ app_id: ADZUNA_APP_ID, app_key: ADZUNA_APP_KEY, results_per_page: '24', 'content-type':'application/json' });
+  if(loc) params.set('where', loc);
+  let what = keyword;
+  if(tabType === 'Government') params.set('category', 'public-sector-jobs');
+  if(!what && tabType === 'Government') what = 'technology';
+  if(what) params.set('what', what);
+  const url = `https://api.adzuna.com/v1/api/jobs/in/search/1?${params.toString()}`;
+  try{
+    const res = await fetch(url);
+    if(!res.ok) throw new Error('bad status');
+    const data = await res.json();
+    if(myToken !== jobsLoadToken) return;
+    let results = (data.results||[]).map(j=>({
+      title: j.title.replace(/<[^>]+>/g,''),
+      org: (j.company && j.company.display_name) || 'Company not disclosed',
+      loc: (j.location && j.location.display_name) || 'India',
+      salary: adzunaSalary(j),
+      posted: j.created ? new Date(j.created).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'}) : '',
+      applyUrl: j.redirect_url,
+      isGovt: tabType==='Government' || /government|public sector|govt|ministry|municipal|railway/i.test(j.company?.display_name||''),
+    }));
+    if(tabType === 'Private') results = results.filter(r=>!r.isGovt);
+    if(container) container.innerHTML = jobList(results);
+  }catch(e){
+    if(myToken !== jobsLoadToken) return;
+    if(container) container.innerHTML = `<div class="empty-state">Couldn't load live jobs right now — check your connection, or search Naukri / Foundit / Indeed above.</div>`;
+  }
 }
 function findJobs(){
-  const role = document.getElementById('jobRole').value.trim().toLowerCase();
-  const skill = document.getElementById('jobSkill').value.trim().toLowerCase();
-  const loc = document.getElementById('jobLoc').value.trim();
-  state.jobLocFilter = loc; // remember the choice so it sticks across re-renders
-  let list = JOBS.filter(isJobOpen);
-  if(role) list = list.filter(j => j.title.toLowerCase() === role);
-  if(skill) list = list.filter(j => j.title.toLowerCase().includes(skill) || (j.skills||[]).some(s=>s.toLowerCase().includes(skill)));
-  if(loc) list = list.filter(j => j.loc === loc || j.loc==='Remote' || j.loc==='Multiple');
-  document.querySelectorAll('.tabs button').forEach((b,i)=>{ b.classList.toggle('active', i===0); });
-  document.getElementById('jobsTab').innerHTML = jobList(list);
-  flashToast(list.length+' job(s) found'+(role?' for "'+document.getElementById('jobRole').selectedOptions[0].text+'"':'')+(skill?' + skill "'+skill+'"':'')+(loc?' in "'+loc+'"':' across All India'));
+  loadLiveJobs();
 }
 function showAllIndiaJobs(){
   state.jobLocFilter = '';
   render();
 }
 function openJobPortal(site){
-  const skillEl = document.getElementById('jobSkill');
+  const keywordEl = document.getElementById('jobKeyword');
   const locEl = document.getElementById('jobLoc');
-  const skill = (skillEl ? skillEl.value.trim() : '') || 'jobs';
+  const skill = (keywordEl ? keywordEl.value.trim() : '') || 'jobs';
   const loc = (locEl ? locEl.value.trim() : '') || 'India';
   const q = encodeURIComponent(skill), l = encodeURIComponent(loc);
   const urls = {
@@ -3311,7 +3345,9 @@ function openJobPortal(site){
   window.open(urls[site], '_blank', 'noopener');
   flashToast('Opening '+site+' in a new tab…');
 }
-
+  
+  
+  
 /* ==================== Career Tools: Interview Prep, Salary Calculator, Career Roadmap ====================
    NOTE on scope/honesty: the Q&A banks, negotiation tips, and roadmaps
    below are curated static content (real, commonly-asked questions and
@@ -4402,15 +4438,6 @@ function adminProducts(){
   const rows = PRODUCTS.slice(0,8).map(p=>[p.name, cats(p.cat), fmt(p.price), '10/10 AI views ✓']);
   return tableCard(['Product','Category','Price','AI Preview Status'], rows);
 }
-function adminAffiliate(){
-  return `<div class="card" style="padding:10px">
-    ${AFFILIATE_ADMIN.map(a=>`
-    <div class="toggle-row">
-      <span><b>${a.name}</b> <span style="color:var(--muted);font-size:12px">· ${a.clicks.toLocaleString('en-IN')} clicks (30d)</span></span>
-      <div class="switch ${a.enabled?'on':''}" onclick="this.classList.toggle('on')"><i></i></div>
-    </div>`).join('')}
-  </div>`;
-}
 function adminAnalytics(){
   const kpis = [
     ['MRR', fmt(312000), '#2a78d6'], ['ARR', fmt(3744000), '#1baf7a'], ['ARPU', fmt(38), '#eda100'],
@@ -4420,7 +4447,7 @@ function adminAnalytics(){
   return `<div class="grid kpi">${kpis.map(([l,v,c])=>statTile(l,v,null,c)).join('')}</div>`;
 }
 function adminSettings(){
-  return `<div class="card" style="padding:16px;max-width:480px">
+  return `<div class="card" style="pad9ding:16px;max-width:480px">
     <div class="toggle-row"><span>Maintenance mode</span><div class="switch" onclick="this.classList.toggle('on')"><i></i></div></div>
     <div class="toggle-row"><span>New signups enabled</span><div class="switch on" onclick="this.classList.toggle('on')"><i></i></div></div>
     <div class="toggle-row"><span>Feature flag: AR 3D room placement</span><div class="switch on" onclick="this.classList.toggle('on')"><i></i></div></div>
@@ -4438,6 +4465,7 @@ function afterRender(root, parts){
   window.scrollTo(0,0);
   if(root === 'room-ar' && typeof attachRoomCameraStream === 'function') attachRoomCameraStream();
   if(root === 'price-watch' && typeof startPriceWatchInterval === 'function') startPriceWatchInterval();
+  if(root === 'jobs' && typeof loadLiveJobs === 'function') loadLiveJobs();
 }
 
 document.getElementById('demoVideoSource').src = demoVideoSrcFor(state.loginDemoLang || 'en');
