@@ -2588,8 +2588,9 @@ function renderAICamera(){
       ${UPLOAD_CATEGORIES.map(c=>`<button type="button" class="${state.uploadedCategory===c.query?'active':''}" onclick="selectUploadCategory('${c.query}')">${c.label}</button>`).join('')}
     </div>
     <label style="text-align:left;margin-top:14px">2. Upload a product photo (e.g. a dress, shoe, or gadget)</label>
-    <label class="btn sm" style="display:inline-block;cursor:pointer">📷 Take a Photo<input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handleUpload(event)" style="display:none"></label>
-    <label class="btn secondary sm" style="display:inline-block;cursor:pointer;margin-left:8px">📁 Choose File<input type="file" accept="image/*" onchange="handleUpload(event)" style="display:none"></label>
+    <div id="uploadHint" style="font-size:12px;color:var(--accent);font-weight:700;margin:2px 0 6px;${state.uploadedCategory?'display:none':''}">☝️ Tap a category above first — the upload buttons unlock once you do.</div>
+    <label id="takePhotoLabel" class="btn sm" style="display:inline-block;cursor:pointer;${state.uploadedCategory?'':'opacity:.45;pointer-events:none;'}">📷 Take a Photo<input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handleUpload(event)" style="display:none" ${state.uploadedCategory?'':'disabled'}></label>
+    <label id="chooseFileLabel" class="btn secondary sm" style="display:inline-block;cursor:pointer;margin-left:8px;${state.uploadedCategory?'':'opacity:.45;pointer-events:none;'}">📁 Choose File<input type="file" id="fileInputChoose" accept="image/*" onchange="handleUpload(event)" style="display:none" ${state.uploadedCategory?'':'disabled'}></label>
     <div id="progWrap" class="progresswrap hidden"><div id="progBar" class="progressbar"></div></div>
     <div id="genStatus" style="font-size:12px;color:var(--text-secondary);margin-top:6px"></div>
 <div id="angleResult" style="margin-top:16px"></div>
@@ -2631,6 +2632,20 @@ const ANGLES = [
 function selectUploadCategory(query){
   state.uploadedCategory = query;
   document.querySelectorAll('#categoryChips button').forEach(b=>b.classList.toggle('active', b.textContent.trim()===UPLOAD_CATEGORIES.find(c=>c.query===query).label));
+  // Unlock the upload buttons immediately — they start disabled (see
+  // renderAICamera) so it's impossible to open the file picker before a
+  // category is picked, rather than relying on someone noticing a toast
+  // message after the fact.
+  const hint = document.getElementById('uploadHint');
+  if(hint) hint.style.display = 'none';
+  ['takePhotoLabel','chooseFileLabel'].forEach(id=>{
+    const label = document.getElementById(id);
+    if(!label) return;
+    label.style.opacity = '';
+    label.style.pointerEvents = '';
+    const input = label.querySelector('input[type=file]');
+    if(input) input.disabled = false;
+  });
   // If a photo was already uploaded, re-render results so the similar-products
   // links below immediately reflect the newly chosen category.
   if(state.uploadedImage) runGeneration();
