@@ -2811,15 +2811,36 @@ function playPreviewMusic(){
     previewGain.gain.exponentialRampToValueAtTime(0.18, previewAudioCtx.currentTime + 0.6);
     const mood = moodForCurrentImage();
     previewOscillators = mood.freqs.flatMap((f,i)=>{
+      // Triangle wave + a gentle lowpass instead of a bare sine — pure
+      // sine tones with wide pitch wobble is a classic horror/theremin
+      // sound-design trick, which is exactly what this was accidentally
+      // doing. Triangle+filter reads as a warm, soft pad instead.
       const osc = previewAudioCtx.createOscillator();
-      osc.type = 'sine'; osc.frequency.value = f;
+      osc.type = 'triangle'; osc.frequency.value = f;
+      const filter = previewAudioCtx.createBiquadFilter();
+      filter.type = 'lowpass'; filter.frequency.value = 1100; filter.Q.value = 0.3;
+
+      // Subtle pitch vibrato — a fraction of a semitone, like a real
+      // instrument — instead of the old several-Hz wobble that caused the
+      // unsettling wavering/theremin effect.
       const lfo = previewAudioCtx.createOscillator();
       const lfoGain = previewAudioCtx.createGain();
-      lfo.frequency.value = mood.lfoBase + i*0.05; lfoGain.gain.value = 3;
+      lfo.frequency.value = mood.lfoBase + i*0.05; lfoGain.gain.value = 1.2;
       lfo.connect(lfoGain); lfoGain.connect(osc.frequency);
-      osc.connect(previewGain);
-      osc.start(); lfo.start();
-      return [osc, lfo];
+
+      // Slow amplitude "breathing" so each note gently swells and settles
+      // instead of sitting as one flat, static drone — gives the pad a
+      // sense of movement, closer to actual ambient music.
+      const tremolo = previewAudioCtx.createOscillator();
+      const tremoloGain = previewAudioCtx.createGain();
+      const noteGain = previewAudioCtx.createGain();
+      tremolo.frequency.value = 0.09 + i*0.02; tremoloGain.gain.value = 0.15;
+      noteGain.gain.value = 1;
+      tremolo.connect(tremoloGain); tremoloGain.connect(noteGain.gain);
+
+      osc.connect(filter); filter.connect(noteGain); noteGain.connect(previewGain);
+      osc.start(); lfo.start(); tremolo.start();
+      return [osc, lfo, tremolo];
     });
     previewMusicPlaying = true;
     const btn = document.getElementById('musicToggleBtn');
