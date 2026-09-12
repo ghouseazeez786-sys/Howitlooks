@@ -497,12 +497,14 @@ const ICONS = {
   droplet:'<path d="M12 3s7 8 7 12.5A7 7 0 0 1 5 15.5C5 11 12 3 12 3z"/>',
   ambulance:'<rect x="2" y="9" width="14" height="8" rx="1.5"/><path d="M16 12h4l2 3v2h-6z"/><circle cx="6.5" cy="18.5" r="1.7"/><circle cx="17.5" cy="18.5" r="1.7"/><path d="M7 11v4M5 13h4"/>',
   expand:'<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/>',
-  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 21a2 2 0 0 0 4 0"/>'
+  bell:'<path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 21a2 2 0 0 0 4 0"/>',
+  flame:'<path d="M12 2c2 4-2 5-2 9a4 4 0 0 0 8 0c0-2-1-3-1-5 3 2 5 6 5 9a8 8 0 0 1-16 0c0-6 4-9 6-13z"/>'
 };
 function icon(name){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`; }
 
 const NAV = [
   {id:'home', label:'Home', icon:'home'},
+  {id:'deals', label:"Today's Deals", icon:'flame'},
   {id:'ai-camera', label:'AI Camera', icon:'camera'},
   {id:'price-compare', label:'Price Compare', icon:'tag'},
   {id:'hospitals', label:'Hospitals', icon:'health'},
@@ -768,11 +770,24 @@ function todayDateKey(){
   return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
 }
 const DAILY_KEY = todayDateKey();
+// Deterministic "ready to opt" coupon code for any string (product id, or a
+// category+store combo for the AI Camera "similar products" section) — same
+// seeded-random pattern as the daily discounts above, so codes are stable
+// for everyone all day, then change again automatically tomorrow.
+function couponCodeFor(seedStr){
+  const rnd = mulberry32(stringSeed(DAILY_KEY + '|COUPON|' + seedStr));
+  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no confusing 0/O/1/I
+  let code = '';
+  for(let i=0;i<6;i++) code += letters[Math.floor(rnd()*letters.length)];
+  return 'HOWIT' + code;
+}
 PRODUCTS.forEach(p=>{
   const rnd = mulberry32(stringSeed(DAILY_KEY + '|' + p.id));
   const discountPct = 12 + Math.floor(rnd()*29); // 12%–40%, changes daily per product
   p.discountPct = discountPct;
   p.price = Math.max(1, Math.round(p.mrp * (1 - discountPct/100) / 10) * 10 - 1);
+  p.couponCode = couponCodeFor(p.id);
+  p.couponExtraPct = 5 + Math.floor(rnd()*10); // extra 5%-14% off with the code, changes daily
 });
 const TODAYS_DEALS = [...PRODUCTS].sort((a,b)=>b.discountPct-a.discountPct).slice(0,8);
 const MAX_DEAL_DISCOUNT = TODAYS_DEALS.length ? TODAYS_DEALS[0].discountPct : 30;
@@ -1793,9 +1808,9 @@ function renderHome(){
   <div class="section-title"><h2>Shop by Category</h2><button type="button" class="pill pill-btn" onclick="goTo('#/compare-stores')">Compare famous stores</button></div>
   ${renderCategoryGrid(true)}
 
-  <div class="section-title"><h2>🔥 Today's Deals</h2><button type="button" class="pill pill-btn" onclick="goTo('#/deals')">Up to ${MAX_DEAL_DISCOUNT}% off</button></div>
-  <div style="font-size:11px;color:var(--muted);margin:-8px 0 10px">Deals refresh automatically every day — today's picks for ${DAILY_KEY}.</div>
-  <div class="row-scroll">${deals.map(productCard).join('')}</div>
+  <div class="section-title"><h2>🔥 Low Affordable Prices Today</h2><button type="button" class="pill pill-btn" onclick="goTo('#/deals')">Up to ${MAX_DEAL_DISCOUNT}% off</button></div>
+  <div style="font-size:11px;color:var(--muted);margin:-8px 0 10px">Prices and coupon codes refresh automatically every day — today's picks for ${DAILY_KEY}.</div>
+  <div class="row-scroll">${deals.map(dealCard).join('')}</div>
 
   <div class="section-title"><h2>${rec.personalized ? '🎯 Recommended for you — based on your activity' : '⭐ Trending & Recommended for you'}</h2></div>
   <div class="grid products">${rec.list.map(productCard).join('')}</div>
@@ -1850,9 +1865,9 @@ function renderCompareStores(){
 function renderDeals(){
   const all = [...PRODUCTS].sort((a,b)=>b.discountPct-a.discountPct);
   return `
-  <div class="section-title"><h2>🔥 All Deals — up to ${MAX_DEAL_DISCOUNT}% off</h2><span class="pill">${all.length} items</span></div>
-  <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Discounts refresh automatically every day (today: ${DAILY_KEY}) — sorted biggest discount first.</div>
-  <div class="grid products">${all.map(productCard).join('')}</div>
+  <div class="section-title"><h2>🔥 Low Affordable Prices Today — up to ${MAX_DEAL_DISCOUNT}% off</h2><span class="pill">${all.length} items</span></div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Prices and coupon codes both refresh automatically every day (today: ${DAILY_KEY}) — sorted biggest discount first. Tap "Copy" on any coupon, then use it at checkout.</div>
+  <div class="grid products">${all.map(dealCard).join('')}</div>
   `;
 }
 function renderCategoryProducts(catId){
@@ -2018,12 +2033,47 @@ function productCard(p){
     </div>
   </div>`;
 }
+// Same as productCard() but adds a "ready to opt" coupon strip — used on the
+// Today's Deals page and the Home page deals row, where showing the coupon
+// matters most.
+function dealCard(p){
+  return `
+  <div class="card prod-card">
+    <span class="badge">${p.discountPct}% OFF</span>
+    <button type="button" style="display:block;width:100%;padding:0;border:none;background:none;cursor:pointer" onclick="goTo('#/product/${p.id}')"><img class="thumb" src="${p.img}" alt="${p.name}"></button>
+    <div class="body">
+      <div class="name">${p.name}</div>
+      <div>⭐ ${p.rating} <span style="color:var(--muted)">· ${cats(p.cat)}</span></div>
+      <div class="price">${fmt(p.price)}<span class="mrp">${fmt(p.mrp)}</span></div>
+      <div class="card" style="padding:8px 10px;margin-top:8px;background:color-mix(in srgb,var(--good) 12%,var(--surface));border:1px dashed var(--good)">
+        <div style="font-size:10.5px;font-weight:800;color:var(--good);letter-spacing:.2px">🎟️ EXTRA ${p.couponExtraPct}% OFF WITH CODE</div>
+        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:4px">
+          <code style="font-weight:800;letter-spacing:.5px;font-size:13px">${p.couponCode}</code>
+          <button type="button" class="btn sm" style="padding:4px 8px;font-size:11px" onclick="copyCoupon('${p.couponCode}', event)">Copy</button>
+        </div>
+      </div>
+      <div class="btnrow" style="margin-top:8px">
+        <button class="btn sm" onclick="location.hash='#/product/${p.id}'">View</button>
+        <button class="btn sm secondary" onclick="addToCart('${p.id}')">🛒 Add</button>
+      </div>
+    </div>
+  </div>`;
+}
 function cats(id){ const c = CATS.find(c=>c.id===id); return c?c.label:id; }
 function addToCart(id){
   state.cart.push(id);
   updateCartCount();
   const p = PRODUCTS.find(p=>p.id===id);
   flashToast(`Added "${p.name}" to cart`);
+}
+function copyCoupon(code, evt){
+  if(evt && evt.stopPropagation) evt.stopPropagation();
+  const done = ()=> flashToast(`Copied "${code}" — paste it at checkout for extra savings`);
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(code).then(done).catch(done);
+  } else {
+    done();
+  }
 }
 function trackProductView(id){
   state.viewedProducts = [id, ...state.viewedProducts.filter(x=>x!==id)].slice(0,20);
@@ -2382,21 +2432,34 @@ const SIMILAR_TIERS = [
 const CATEGORY_BASE_PRICE = { shoes:1899, dress:1299, handbag:2199, watch:2499, furniture:4999, electronics:3499, jewellery:3999, 'trending products':999 };
 function similarProductsFor(query){
   const base = CATEGORY_BASE_PRICE[query] || 1499;
-  return SIMILAR_TIERS.map(t=>({ tag:t.tag, price: Math.round(base*t.mult/10)*10 }));
+  return SIMILAR_TIERS.map(t=>({
+    tag:t.tag,
+    price: Math.round(base*t.mult/10)*10,
+    coupon: couponCodeFor(query + '|' + t.tag),
+  }));
 }
 function renderSimilarProducts(){
   const cat = UPLOAD_CATEGORIES.find(c=>c.query===state.uploadedCategory) || UPLOAD_CATEGORIES[UPLOAD_CATEGORIES.length-1];
   const items = similarProductsFor(cat.query);
   return `<div class="card" style="padding:16px;margin-top:14px">
-    <div style="font-weight:800;margin-bottom:4px">🔎 Similar products — available on Amazon, Flipkart &amp; Myntra</div>
-    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Based on category: <b>${cat.label}</b>. Prices shown are indicative for this demo — tap a store button to see real, live results and buy.</div>
+    <div style="font-weight:800;margin-bottom:4px">🔎 Similar products in other stores — Amazon, Flipkart, Myntra, Meesho, Snapdeal &amp; Ajio</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Based on category: <b>${cat.label}</b>. Prices are indicative for this demo. Each row has a ready-to-opt coupon code that refreshes daily (today: ${DAILY_KEY}) — tap Copy, then tap a store to see real, live results and apply it at checkout.</div>
     ${items.map(it=>`
-      <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px">
-        <div><div style="font-weight:700">${it.tag}</div><div style="font-size:13px;color:var(--text-secondary)">${fmt(it.price)} (approx.)</div></div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
+      <div style="padding:10px 0;border-bottom:1px solid var(--border)">
+        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+          <div><div style="font-weight:700">${it.tag}</div><div style="font-size:13px;color:var(--text-secondary)">${fmt(it.price)} (approx.)</div></div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <code style="font-weight:800;font-size:12.5px">${it.coupon}</code>
+            <button type="button" class="btn sm secondary" style="padding:4px 8px;font-size:11px" onclick="copyCoupon('${it.coupon}', event)">Copy</button>
+          </div>
+        </div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
           <a class="btn" style="padding:6px 10px;font-size:12px" href="${amazonLink(cat.query)}" target="_blank" rel="noopener">Amazon</a>
           <a class="btn" style="padding:6px 10px;font-size:12px" href="${flipkartLink(cat.query)}" target="_blank" rel="noopener">Flipkart</a>
           <a class="btn" style="padding:6px 10px;font-size:12px" href="${myntraLink(cat.query)}" target="_blank" rel="noopener">Myntra</a>
+          <a class="btn" style="padding:6px 10px;font-size:12px" href="${meeshoLink(cat.query)}" target="_blank" rel="noopener">Meesho</a>
+          <a class="btn" style="padding:6px 10px;font-size:12px" href="${snapdealLink(cat.query)}" target="_blank" rel="noopener">Snapdeal</a>
+          <a class="btn" style="padding:6px 10px;font-size:12px" href="${ajioLink(cat.query)}" target="_blank" rel="noopener">Ajio</a>
         </div>
       </div>`).join('')}
   </div>`;
