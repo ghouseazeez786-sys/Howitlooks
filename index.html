@@ -1107,6 +1107,7 @@ const state = {
   route:'home',
   uploadedImage:null,
   uploadedCategory:'',
+  uploadedDescription:'',
   resultTab:'angles',
   loginDemoLang:'en',
   // "View in My Room" — Stage 2 (AR room placement): a photo of the user's
@@ -2523,8 +2524,8 @@ const SIMILAR_TIERS = [
   {tag:'⭐ Luxury pick', mult:3.0},
 ];
 const CATEGORY_BASE_PRICE = { shoes:1899, dress:1299, handbag:2199, watch:2499, furniture:4999, electronics:3499, refrigerator:15999, 'mobile phone':12999, jewellery:3999, 'trending products':999 };
-function similarProductsFor(query){
-  const base = CATEGORY_BASE_PRICE[query] || 1499;
+function similarProductsFor(query, priceKey){
+  const base = CATEGORY_BASE_PRICE[priceKey] || 1499;
   return SIMILAR_TIERS.map(t=>({
     tag:t.tag,
     price: Math.round(base*t.mult/10)*10,
@@ -2543,10 +2544,22 @@ function renderSimilarProducts(){
       <div style="font-size:13px;color:var(--text-secondary)">"Other" doesn't tell us enough to find accurate matches — please go back up and tap the category that's closest to your photo (e.g. Electronics, Appliances) instead, so the results here actually match what you uploaded.</div>
     </div>`;
   }
-  const items = similarProductsFor(cat.query);
+  // A bare category word like "electronics" is far too broad — searching
+  // it returns whatever's generically popular under that category
+  // (kitchen scales, irons, etc.), not anything to do with the specific
+  // product that was actually photographed. Whatever the user typed in
+  // step 2 (e.g. "43 inch Samsung Smart TV") is a real, specific search
+  // term, so it's used for the store links whenever it's filled in —
+  // falling back to the plain category only if it's left blank.
+  const desc = (state.uploadedDescription||'').trim();
+  const searchQuery = desc || cat.query;
+  const items = similarProductsFor(searchQuery, cat.query);
   return `<div class="card" style="padding:16px;margin-top:14px">
     <div style="font-weight:800;margin-bottom:4px">🔎 Similar products in other stores — Amazon, Flipkart, Myntra, Meesho, Snapdeal &amp; Ajio</div>
-    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Based on category: <b>${cat.label}</b>. Prices are indicative for this demo. Each row has a ready-to-opt coupon code that refreshes daily (today: ${DAILY_KEY}) — tap Copy, then tap a store to see real, live results and apply it at checkout.</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">${desc
+      ? `Searching for: <b>"${desc}"</b> (category: ${cat.label}).`
+      : `Based on category only: <b>${cat.label}</b> — for accurate matches, go back to step 2 and describe your product (e.g. "43 inch Samsung Smart TV") instead of relying on the category alone, which is too broad.`
+    } Prices are indicative for this demo. Each row has a ready-to-opt coupon code that refreshes daily (today: ${DAILY_KEY}) — tap Copy, then tap a store to see real, live results and apply it at checkout.</div>
     ${items.map(it=>`
       <div style="padding:10px 0;border-bottom:1px solid var(--border)">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -2557,12 +2570,12 @@ function renderSimilarProducts(){
           </div>
         </div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
-          <a class="btn" style="padding:6px 10px;font-size:12px" href="${amazonLink(cat.query)}" target="_blank" rel="noopener">Amazon</a>
-          <a class="btn" style="padding:6px 10px;font-size:12px" href="${flipkartLink(cat.query)}" target="_blank" rel="noopener">Flipkart</a>
-          <a class="btn" style="padding:6px 10px;font-size:12px" href="${myntraLink(cat.query)}" target="_blank" rel="noopener">Myntra</a>
-          <a class="btn" style="padding:6px 10px;font-size:12px" href="${meeshoLink(cat.query)}" target="_blank" rel="noopener">Meesho</a>
-          <a class="btn" style="padding:6px 10px;font-size:12px" href="${snapdealLink(cat.query)}" target="_blank" rel="noopener">Snapdeal</a>
-          <a class="btn" style="padding:6px 10px;font-size:12px" href="${ajioLink(cat.query)}" target="_blank" rel="noopener">Ajio</a>
+          <a class="btn" style="padding:6px 10px;font-size:12px" href="${amazonLink(searchQuery)}" target="_blank" rel="noopener">Amazon</a>
+          <a class="btn" style="padding:6px 10px;font-size:12px" href="${flipkartLink(searchQuery)}" target="_blank" rel="noopener">Flipkart</a>
+          <a class="btn" style="padding:6px 10px;font-size:12px" href="${myntraLink(searchQuery)}" target="_blank" rel="noopener">Myntra</a>
+          <a class="btn" style="padding:6px 10px;font-size:12px" href="${meeshoLink(searchQuery)}" target="_blank" rel="noopener">Meesho</a>
+          <a class="btn" style="padding:6px 10px;font-size:12px" href="${snapdealLink(searchQuery)}" target="_blank" rel="noopener">Snapdeal</a>
+          <a class="btn" style="padding:6px 10px;font-size:12px" href="${ajioLink(searchQuery)}" target="_blank" rel="noopener">Ajio</a>
         </div>
       </div>`).join('')}
   </div>`;
@@ -2587,8 +2600,10 @@ function renderAICamera(){
     <div class="tabs" style="flex-wrap:wrap;gap:6px" id="categoryChips">
       ${UPLOAD_CATEGORIES.map(c=>`<button type="button" class="${state.uploadedCategory===c.query?'active':''}" onclick="selectUploadCategory('${c.query}')">${c.label}</button>`).join('')}
     </div>
-    <label style="text-align:left;margin-top:14px">2. Upload a product photo (e.g. a dress, shoe, or gadget)</label>
-    <div id="uploadHint" style="font-size:12.5px;color:var(--text-secondary);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:2px 0 10px">📝 <b>Note:</b> First select a category above (Shoes, Electronics, Appliances, etc.), then take or choose your photo — the upload buttons stay greyed out until a category is picked, so Howitlooks always knows what it's matching your photo against.</div>
+    <label style="text-align:left;margin-top:14px">2. Describe it in a few words (this is what makes the matches below accurate — a broad category alone isn't enough)</label>
+    <input type="text" id="productDescInput" value="${(state.uploadedDescription||'').replace(/"/g,'&quot;')}" oninput="state.uploadedDescription=this.value; if(state.uploadedImage && typeof renderResultTabs==='function') renderResultTabs();" placeholder="e.g. '43 inch Samsung Smart TV', 'Nike running shoes', 'iPhone 13'" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text-primary);font-size:14px;font-family:inherit">
+    <label style="text-align:left;margin-top:14px">3. Upload a product photo</label>
+    <div id="uploadHint" style="font-size:12.5px;color:var(--text-secondary);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:2px 0 10px"><b>📝 Note: First select a category and describe your product above, then take or choose your photo — the upload buttons stay greyed out until a category is picked, so Howitlooks always knows what it's matching your photo against.</b></div>
     <label id="takePhotoLabel" class="btn sm" style="display:inline-block;cursor:pointer;${state.uploadedCategory?'':'opacity:.45;pointer-events:none;'}">📷 Take a Photo<input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handleUpload(event)" style="display:none" ${state.uploadedCategory?'':'disabled'}></label>
     <label id="chooseFileLabel" class="btn secondary sm" style="display:inline-block;cursor:pointer;margin-left:8px;${state.uploadedCategory?'':'opacity:.45;pointer-events:none;'}">📁 Choose File<input type="file" id="fileInputChoose" accept="image/*" onchange="handleUpload(event)" style="display:none" ${state.uploadedCategory?'':'disabled'}></label>
     <div id="progWrap" class="progresswrap hidden"><div id="progBar" class="progressbar"></div></div>
