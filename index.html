@@ -275,6 +275,15 @@
   [data-theme="dark"] .angle-zoom-box img{background:#ffffff12;}
   .video-enlarge-box{max-width:min(92vw,420px);padding:16px;}
 
+  /* ---- Hover-to-zoom magnifier lens (Amazon-style): move the mouse over a
+     zoomable image and a magnified circular window follows the cursor,
+     showing that exact part of the photo close-up and enlarged. Desktop
+     (mouse) only — see attachImageZoom() below, which checks pointer:fine
+     before wiring this up, so touch/mobile just shows the plain image. ---- */
+  .zoom-wrap{position:relative;display:block;}
+  .zoom-wrap img{display:block;}
+  .zoom-lens{position:absolute;display:none;pointer-events:none;border:3px solid var(--brand);border-radius:50%;width:150px;height:150px;background-repeat:no-repeat;box-shadow:0 8px 24px rgba(0,0,0,.4);z-index:6;}
+
   /* ---- Demo walkthrough modal (AI Camera "Watch how it works") ---- */
   .modal-overlay{position:fixed;inset:0;background:rgba(10,10,25,.6);display:flex;align-items:center;justify-content:center;z-index:200;padding:16px;}
   .modal-box{background:var(--surface);border-radius:16px;max-width:420px;width:100%;padding:22px;position:relative;box-shadow:0 24px 60px rgba(0,0,0,.4);}
@@ -522,6 +531,12 @@ const CATS = [
   {id:'bags', label:'Bags', em:'👜'},
   {id:'appliances', label:'Home Appliances', em:'🏠'},
   {id:'healthcare', label:'Free Healthcare facility', em:'🩺'},
+  {id:'books', label:'Books', em:'📚'},
+  {id:'grocery', label:'Grocery', em:'🥦'},
+  {id:'beauty', label:'Beauty & Personal Care', em:'💄'},
+  {id:'toys', label:'Toys & Baby', em:'🧸'},
+  {id:'sports', label:'Sports & Fitness', em:'🏋️'},
+  {id:'stationery', label:'Stationery & Office', em:'🖊️'},
 ];
 /* Tapping a category no longer jumps straight to one external site — instead
    it opens an internal page comparing several well-known stores for that
@@ -605,6 +620,36 @@ const BRANDS_BY_CATEGORY = {
     {name:'MedPlus', url:'https://www.medplusmart.com/'}, {name:'Truemeds', url:'https://www.truemeds.in/'},
     {name:'Amazon Pharmacy', url:'https://www.amazon.in/health'}, {name:'Flipkart Health+', url:'https://www.flipkarthealthplus.com/'},
   ],
+  books: [
+    {name:'Amazon.in', url:'https://www.amazon.in/'}, {name:'Flipkart', url:'https://www.flipkart.com/'},
+    {name:'Crossword Bookstores', url:'https://www.crossword.in/'}, {name:'Sapna Online', url:'https://www.sapnaonline.com/'},
+    {name:'BookChor', url:'https://www.bookchor.com/'}, {name:'Meesho', url:'https://www.meesho.com/'},
+  ],
+  grocery: [
+    {name:'JioMart', url:'https://www.jiomart.com/'}, {name:'BigBasket', url:'https://www.bigbasket.com/'},
+    {name:'Blinkit', url:'https://blinkit.com/'}, {name:'Zepto', url:'https://www.zeptonow.com/'},
+    {name:'Amazon Fresh', url:'https://www.amazon.in/fresh'}, {name:'Flipkart Grocery', url:'https://www.flipkart.com/grocery-supermart-store'},
+  ],
+  beauty: [
+    {name:'Nykaa', url:'https://www.nykaa.com/'}, {name:'Purplle', url:'https://www.purplle.com/'},
+    {name:'Myntra', url:'https://www.myntra.com/'}, {name:'Amazon.in', url:'https://www.amazon.in/'},
+    {name:'Flipkart', url:'https://www.flipkart.com/'}, {name:'Health & Glow', url:'https://www.healthandglow.com/'},
+  ],
+  toys: [
+    {name:'FirstCry', url:'https://www.firstcry.com/'}, {name:'Amazon.in', url:'https://www.amazon.in/'},
+    {name:'Flipkart', url:'https://www.flipkart.com/'}, {name:'Hamleys India', url:'https://www.hamleys.in/'},
+    {name:'Myntra', url:'https://www.myntra.com/'}, {name:'Meesho', url:'https://www.meesho.com/'},
+  ],
+  sports: [
+    {name:'Decathlon', url:'https://www.decathlon.in/'}, {name:'Amazon.in', url:'https://www.amazon.in/'},
+    {name:'Flipkart', url:'https://www.flipkart.com/'}, {name:'Nike India', url:'https://www.nike.com/in/'},
+    {name:'Adidas India', url:'https://www.adidas.co.in/'}, {name:'Puma India', url:'https://in.puma.com/'},
+  ],
+  stationery: [
+    {name:'Amazon.in', url:'https://www.amazon.in/'}, {name:'Flipkart', url:'https://www.flipkart.com/'},
+    {name:'Meesho', url:'https://www.meesho.com/'}, {name:'Snapdeal', url:'https://www.snapdeal.com/'},
+    {name:'JioMart', url:'https://www.jiomart.com/'}, {name:'Croma', url:'https://www.croma.com/'},
+  ],
 };
 const PALETTE_BG = ['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#4a3aa7','#e34948','#008300'];
 const PRODUCTS = [
@@ -667,6 +712,36 @@ const PRODUCTS = [
   {id:'p57', name:'Magnetic Wireless Charging Case', cat:'mobiles', price:599, mrp:899},
   {id:'p58', name:'Waterproof Pouch Cover for Phones', cat:'mobiles', price:299, mrp:499},
   {id:'p59', name:'9H Privacy Screen Protector (Anti-Spy)', cat:'mobiles', price:249, mrp:449},
+  {id:'p60', name:'Atomic Habits (Paperback Book)', cat:'books', price:399, mrp:599},
+  {id:'p61', name:'The Alchemist (Paperback Book)', cat:'books', price:249, mrp:399},
+  {id:'p62', name:"Rich Dad Poor Dad (Paperback Book)", cat:'books', price:299, mrp:449},
+  {id:'p63', name:'Wings of Fire — Autobiography (Paperback Book)', cat:'books', price:229, mrp:350},
+  {id:'p64', name:"Children's Illustrated Story Books (Set of 5)", cat:'books', price:499, mrp:799},
+  {id:'p65', name:'NCERT-Style Notebook Combo (Pack of 6)', cat:'books', price:349, mrp:499},
+  {id:'p66', name:'Basmati Rice (5kg Pack)', cat:'grocery', price:549, mrp:699},
+  {id:'p67', name:'Cold-Pressed Sunflower Oil (1L)', cat:'grocery', price:189, mrp:249},
+  {id:'p68', name:'Assorted Dry Fruits Gift Box (1kg)', cat:'grocery', price:899, mrp:1299},
+  {id:'p69', name:'Whole Wheat Atta (10kg Pack)', cat:'grocery', price:449, mrp:549},
+  {id:'p70', name:'Organic Toor Dal (2kg Pack)', cat:'grocery', price:279, mrp:349},
+  {id:'p71', name:'Assorted Masala & Spices Combo Pack', cat:'grocery', price:399, mrp:549},
+  {id:'p72', name:'Vitamin C Face Serum (30ml)', cat:'beauty', price:499, mrp:799},
+  {id:'p73', name:'Matte Finish Lipstick Combo (Set of 3)', cat:'beauty', price:599, mrp:899},
+  {id:'p74', name:'Herbal Shampoo & Conditioner Combo', cat:'beauty', price:449, mrp:649},
+  {id:'p75', name:'Sunscreen SPF 50 Gel (75ml)', cat:'beauty', price:399, mrp:599},
+  {id:'p76', name:'Perfume Gift Set for Men & Women', cat:'beauty', price:1299, mrp:1899},
+  {id:'p77', name:'Wooden Building Blocks Set (Kids Toy)', cat:'toys', price:699, mrp:999},
+  {id:'p78', name:'Remote Control Racing Car (Kids Toy)', cat:'toys', price:1299, mrp:1899},
+  {id:'p79', name:'Soft Plush Teddy Bear (2 feet)', cat:'toys', price:599, mrp:899},
+  {id:'p80', name:'Baby Stroller — Foldable & Lightweight', cat:'toys', price:4999, mrp:6999},
+  {id:'p81', name:'Baby Diaper Pants (Pack of 60)', cat:'toys', price:899, mrp:1199},
+  {id:'p82', name:'Yoga Mat with Carry Strap (6mm)', cat:'sports', price:699, mrp:999},
+  {id:'p83', name:'Adjustable Dumbbell Set (10kg Pair)', cat:'sports', price:2499, mrp:3499},
+  {id:'p84', name:'Cricket Bat — Kashmir Willow (Full Size)', cat:'sports', price:1499, mrp:2199},
+  {id:'p85', name:'Football — Size 5 Match Ball', cat:'sports', price:799, mrp:1199},
+  {id:'p86', name:'Skipping Rope with Ball Bearings', cat:'sports', price:299, mrp:449},
+  {id:'p87', name:'A4 Ruled Notebooks (Pack of 10)', cat:'stationery', price:349, mrp:499},
+  {id:'p88', name:'Gel Pens Combo Pack (Set of 20)', cat:'stationery', price:199, mrp:299},
+  {id:'p89', name:'Office Desk Organizer with Drawers', cat:'stationery', price:899, mrp:1299},
 ];
 PRODUCTS.forEach((p,i)=>{ p.img = svgPlaceholder(p.name.split(' ').slice(0,2).join(' '), PALETTE_BG[i%PALETTE_BG.length], '#ffffff'); p.rating=(3.7+ (i%5)*0.25).toFixed(1); });
 
@@ -732,6 +807,22 @@ function flipkartLink(query){
 function myntraLink(query){
   return `https://www.myntra.com/${encodeURIComponent(query.replace(/\s+/g,'-'))}`;
 }
+function meeshoLink(query){
+  return `https://www.meesho.com/search?q=${encodeURIComponent(query)}`;
+}
+function snapdealLink(query){
+  return `https://www.snapdeal.com/search?keyword=${encodeURIComponent(query)}`;
+}
+function ajioLink(query){
+  return `https://www.ajio.com/search/?text=${encodeURIComponent(query)}`;
+}
+// One lookup used everywhere a "Buy on <partner>" button is rendered, so
+// every partner gets a real, working outbound link to that store's own
+// search results for the product — not just Amazon.
+const PARTNER_LINK_BUILDERS = {
+  Amazon: amazonLink, Flipkart: flipkartLink, Myntra: myntraLink,
+  Meesho: meeshoLink, Snapdeal: snapdealLink, Ajio: ajioLink,
+};
 
 const AFFILIATES = [
   {name:'Amazon', color:'#eb6834'}, {name:'Flipkart', color:'#2a78d6'}, {name:'Myntra', color:'#e34948'},
@@ -1833,6 +1924,12 @@ const CATEGORY_ALIASES = {
   mobile:'mobiles', cell:'mobiles', cellphone:'mobiles', smartphone:'mobiles', mobiles:'mobiles', phone:'mobiles',
   fridge:'appliances', freezer:'appliances', appliance:'appliances',
   electronic:'electronics', gadget:'electronics',
+  book:'books', novel:'books', textbook:'books',
+  grocery:'grocery', groceries:'grocery', ration:'grocery', kirana:'grocery',
+  beauty:'beauty', cosmetic:'beauty', cosmetics:'beauty', makeup:'beauty', skincare:'beauty',
+  toy:'toys', baby:'toys', kid:'toys', infant:'toys',
+  sport:'sports', fitness:'sports', gym:'sports', workout:'sports',
+  stationery:'stationery', office:'stationery', notebook:'stationery',
 };
 // Splits a phrase into individual words (stripping punctuation like
 // apostrophes), dropping very short tokens ("s", "a", "of") that would
@@ -1996,7 +2093,7 @@ function renderProduct(id){
   return `
   <div class="card product-detail-grid" style="padding:18px;display:grid;grid-template-columns:minmax(240px,340px) 1fr;gap:22px;">
     <div>
-      <img src="${p.img}" style="border-radius:12px;width:100%" alt="${p.name}">
+      <img id="productMainImg" src="${p.img}" style="border-radius:12px;width:100%" alt="${p.name}">
       <div class="btnrow" style="margin-top:10px">
         <button class="btn block" onclick="location.hash='#/ai-camera/${p.id}'">📷 AI Preview (4 free, up to 20)</button>
       </div>
@@ -2150,6 +2247,54 @@ function closeVideoDemo(){
 function closeVideoDemoAndFocus(){
   closeVideoDemo();
 }
+// Hover-to-zoom magnifier: wraps a real <img> element in a positioned
+// container and, while the mouse moves over it, shows a circular lens that
+// follows the cursor with a magnified (zoomFactor×) close-up of that exact
+// spot, using the image's own full-resolution source as the zoomed view.
+// Desktop/mouse only (checks pointer:fine) — on a touch device the plain
+// image just displays normally, no lens is attached.
+function attachImageZoom(img, zoomFactor){
+  if(!img) return;
+  zoomFactor = zoomFactor || 2.5;
+  if(!window.matchMedia || !window.matchMedia('(pointer:fine)').matches) return;
+  if(img.dataset.zoomOn){
+    // Already wired up — just refresh the zoomed source (image may have
+    // changed, e.g. a different angle was opened into the same modal).
+    const existingLens = img.parentElement.querySelector('.zoom-lens');
+    if(existingLens) existingLens.style.backgroundImage = `url('${img.src}')`;
+    return;
+  }
+  img.dataset.zoomOn = '1';
+  let wrap = img.parentElement;
+  if(!wrap || !wrap.classList.contains('zoom-wrap')){
+    wrap = document.createElement('div');
+    wrap.className = 'zoom-wrap';
+    img.parentNode.insertBefore(wrap, img);
+    wrap.appendChild(img);
+  }
+  const lens = document.createElement('div');
+  lens.className = 'zoom-lens';
+  wrap.appendChild(lens);
+  function move(clientX, clientY){
+    const rect = wrap.getBoundingClientRect();
+    const x = clientX - rect.left, y = clientY - rect.top;
+    if(x<0 || y<0 || x>rect.width || y>rect.height){ lens.style.display='none'; return; }
+    lens.style.display = 'block';
+    const lw = lens.offsetWidth, lh = lens.offsetHeight;
+    let lx = x - lw/2, ly = y - lh/2;
+    lx = Math.max(0, Math.min(lx, rect.width - lw));
+    ly = Math.max(0, Math.min(ly, rect.height - lh));
+    lens.style.left = lx + 'px';
+    lens.style.top = ly + 'px';
+    lens.style.backgroundImage = `url('${img.src}')`;
+    lens.style.backgroundSize = `${rect.width*zoomFactor}px ${rect.height*zoomFactor}px`;
+    const bgX = -((lx + lw/2) * zoomFactor - lw/2);
+    const bgY = -((ly + lh/2) * zoomFactor - lh/2);
+    lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
+  }
+  wrap.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+  wrap.addEventListener('mouseleave', ()=>{ lens.style.display = 'none'; });
+}
 let angleZoomIdx = 0;
 function openAngleZoom(idx){
   const a = ANGLES[idx];
@@ -2162,6 +2307,7 @@ function openAngleZoom(idx){
   img.style.cssText = a.css;
   title.textContent = a.label + ' view';
   modal.classList.remove('hidden');
+  attachImageZoom(img);
 }
 function closeAngleZoom(){
   const m = document.getElementById('angleZoomModal');
@@ -3055,9 +3201,32 @@ function renderPriceWatch(){
 }
 
 function renderPriceHub(){
+  const storeSet = new Set();
+  Object.values(BRANDS_BY_CATEGORY).forEach(list => list.forEach(b => storeSet.add(b.name)));
   return `
-  <div class="section-title"><h2>💰 Price Comparison</h2></div>
-  <p style="color:var(--text-secondary);font-size:13px">Pick a product to compare live prices across affiliate partners.</p>
+  <div class="card" style="padding:24px;background:linear-gradient(120deg,var(--brand),var(--accent),var(--magenta));color:#fff">
+    <h2 style="margin:0 0 8px;font-size:26px">💰 India's Clearest Price Radar</h2>
+    <div style="font-size:14px;opacity:.94;max-width:560px">Search once and see prices side-by-side across Amazon, Flipkart, Myntra, Meesho, Snapdeal and Ajio — then jump straight to the real store to buy.</div>
+  </div>
+  <div class="grid" style="grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-top:14px">
+    <div class="card" style="padding:16px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:var(--brand)">${PRODUCTS.length}+</div>
+      <div style="font-size:11.5px;color:var(--text-secondary);font-weight:700;letter-spacing:.3px;margin-top:2px">PRODUCTS TRACKED</div>
+    </div>
+    <div class="card" style="padding:16px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:var(--accent)">${storeSet.size}</div>
+      <div style="font-size:11.5px;color:var(--text-secondary);font-weight:700;letter-spacing:.3px;margin-top:2px">STORES COMPARED</div>
+    </div>
+    <div class="card" style="padding:16px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:var(--violet)">${CATS.length}</div>
+      <div style="font-size:11.5px;color:var(--text-secondary);font-weight:700;letter-spacing:.3px;margin-top:2px">CATEGORIES</div>
+    </div>
+    <div class="card" style="padding:16px;text-align:center">
+      <div style="font-size:24px;font-weight:800;color:var(--aqua)">6</div>
+      <div style="font-size:11.5px;color:var(--text-secondary);font-weight:700;letter-spacing:.3px;margin-top:2px">PARTNER STORES</div>
+    </div>
+  </div>
+  <div class="section-title" style="margin-top:20px"><h2>Popular right now</h2></div>
   <div class="grid products">${PRODUCTS.slice(0,8).map(productCard).join('')}</div>
   `;
 }
@@ -3076,9 +3245,9 @@ function renderPrice(id){
           <td><b>${fmt(r.price)}</b></td>
           <td>${r.delivery}</td>
           <td>${r.eta}</td>
-          <td>${r.partner==='Amazon'
-            ? `<a class="btn sm" style="background:${r.color};display:inline-block" href="${amazonLink(p.name)}" target="_blank" rel="noopener sponsored">Buy →</a>`
-            : `<button class="btn sm" style="background:${r.color}" onclick="flashToast('Redirecting to ${r.partner} (demo affiliate link — add your ${r.partner} affiliate ID to wire this up)')">Buy →</button>`}</td>
+          <td>${PARTNER_LINK_BUILDERS[r.partner]
+            ? `<a class="btn sm" style="background:${r.color};display:inline-block" href="${PARTNER_LINK_BUILDERS[r.partner](p.name)}" target="_blank" rel="noopener sponsored">Buy →</a>`
+            : `<button class="btn sm" style="background:${r.color}" onclick="flashToast('Redirecting to ${r.partner}...')">Buy →</button>`}</td>
         </tr>
       `).join('')}
       </tbody>
@@ -4466,6 +4635,10 @@ function afterRender(root, parts){
   if(root === 'room-ar' && typeof attachRoomCameraStream === 'function') attachRoomCameraStream();
   if(root === 'price-watch' && typeof startPriceWatchInterval === 'function') startPriceWatchInterval();
   if(root === 'jobs' && typeof loadLiveJobs === 'function') loadLiveJobs();
+  if(root === 'product' && typeof attachImageZoom === 'function'){
+    const img = document.getElementById('productMainImg');
+    if(img) attachImageZoom(img);
+  }
 }
 
 document.getElementById('demoVideoSource').src = demoVideoSrcFor(state.loginDemoLang || 'en');
