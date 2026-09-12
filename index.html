@@ -1137,6 +1137,7 @@ const UPLOAD_CATEGORIES = [
   {label:'Shoes', query:'shoes'}, {label:'Dress / Clothing', query:'dress'},
   {label:'Bag', query:'handbag'}, {label:'Watch', query:'watch'},
   {label:'Furniture', query:'furniture'}, {label:'Electronics', query:'electronics'},
+  {label:'Appliances (Fridge, AC, etc.)', query:'refrigerator'}, {label:'Mobile / Gadget', query:'mobile phone'},
   {label:'Jewellery', query:'jewellery'}, {label:'Other', query:'trending products'},
 ];
 
@@ -2521,7 +2522,7 @@ const SIMILAR_TIERS = [
   {tag:'⭐ Top rated', mult:1.9}, {tag:'⭐ Premium', mult:2.3},
   {tag:'⭐ Luxury pick', mult:3.0},
 ];
-const CATEGORY_BASE_PRICE = { shoes:1899, dress:1299, handbag:2199, watch:2499, furniture:4999, electronics:3499, jewellery:3999, 'trending products':999 };
+const CATEGORY_BASE_PRICE = { shoes:1899, dress:1299, handbag:2199, watch:2499, furniture:4999, electronics:3499, refrigerator:15999, 'mobile phone':12999, jewellery:3999, 'trending products':999 };
 function similarProductsFor(query){
   const base = CATEGORY_BASE_PRICE[query] || 1499;
   return SIMILAR_TIERS.map(t=>({
@@ -2532,6 +2533,16 @@ function similarProductsFor(query){
 }
 function renderSimilarProducts(){
   const cat = UPLOAD_CATEGORIES.find(c=>c.query===state.uploadedCategory) || UPLOAD_CATEGORIES[UPLOAD_CATEGORIES.length-1];
+  // "Other" has no real product word behind it (there's nothing honest to
+  // search for), so rather than fabricate store links against a vague
+  // placeholder term — the exact bug that showed fish oil and digestive
+  // tablets for a fridge photo — say so plainly instead of guessing.
+  if(cat.query === 'trending products'){
+    return `<div class="card" style="padding:16px;margin-top:14px">
+      <div style="font-weight:800;margin-bottom:4px">🔎 Similar products in other stores</div>
+      <div style="font-size:13px;color:var(--text-secondary)">"Other" doesn't tell us enough to find accurate matches — please go back up and tap the category that's closest to your photo (e.g. Electronics, Appliances) instead, so the results here actually match what you uploaded.</div>
+    </div>`;
+  }
   const items = similarProductsFor(cat.query);
   return `<div class="card" style="padding:16px;margin-top:14px">
     <div style="font-weight:800;margin-bottom:4px">🔎 Similar products in other stores — Amazon, Flipkart, Myntra, Meesho, Snapdeal &amp; Ajio</div>
@@ -2627,6 +2638,21 @@ function selectUploadCategory(query){
 function handleUpload(ev){
   const file = ev.target.files[0];
   if(!file) return;
+  // This demo has no real image-recognition — it relies entirely on the
+  // category chip you tap above to know what you uploaded. Skipping that
+  // step used to silently fall back to a meaningless "Other" search, which
+  // is exactly why a fridge photo could come back showing fish oil and
+  // digestive tablets — those have nothing to do with the photo, they were
+  // just top Amazon results for a vague fallback query. Requiring a
+  // category first means the similar-products results always match what
+  // you actually said you uploaded.
+  if(!state.uploadedCategory){
+    ev.target.value = '';
+    flashToast('Please tap what kind of product this is (above) before uploading — that\'s how Howitlooks knows what to match it against');
+    const chips = document.getElementById('categoryChips');
+    if(chips) chips.scrollIntoView({behavior:'smooth', block:'center'});
+    return;
+  }
   const reader = new FileReader();
   reader.onload = e=>{
     state.uploadedImage = e.target.result;
