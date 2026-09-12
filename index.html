@@ -2588,7 +2588,7 @@ function renderAICamera(){
       ${UPLOAD_CATEGORIES.map(c=>`<button type="button" class="${state.uploadedCategory===c.query?'active':''}" onclick="selectUploadCategory('${c.query}')">${c.label}</button>`).join('')}
     </div>
     <label style="text-align:left;margin-top:14px">2. Upload a product photo (e.g. a dress, shoe, or gadget)</label>
-    <div id="uploadHint" style="font-size:12px;color:var(--accent);font-weight:700;margin:2px 0 6px;${state.uploadedCategory?'display:none':''}">☝️ Tap a category above first — the upload buttons unlock once you do.</div>
+    <div id="uploadHint" style="font-size:12.5px;color:var(--text-secondary);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:2px 0 10px">📝 <b>Note:</b> First select a category above (Shoes, Electronics, Appliances, etc.), then take or choose your photo — the upload buttons stay greyed out until a category is picked, so Howitlooks always knows what it's matching your photo against.</div>
     <label id="takePhotoLabel" class="btn sm" style="display:inline-block;cursor:pointer;${state.uploadedCategory?'':'opacity:.45;pointer-events:none;'}">📷 Take a Photo<input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handleUpload(event)" style="display:none" ${state.uploadedCategory?'':'disabled'}></label>
     <label id="chooseFileLabel" class="btn secondary sm" style="display:inline-block;cursor:pointer;margin-left:8px;${state.uploadedCategory?'':'opacity:.45;pointer-events:none;'}">📁 Choose File<input type="file" id="fileInputChoose" accept="image/*" onchange="handleUpload(event)" style="display:none" ${state.uploadedCategory?'':'disabled'}></label>
     <div id="progWrap" class="progresswrap hidden"><div id="progBar" class="progressbar"></div></div>
@@ -2635,9 +2635,9 @@ function selectUploadCategory(query){
   // Unlock the upload buttons immediately — they start disabled (see
   // renderAICamera) so it's impossible to open the file picker before a
   // category is picked, rather than relying on someone noticing a toast
-  // message after the fact.
-  const hint = document.getElementById('uploadHint');
-  if(hint) hint.style.display = 'none';
+  // message after the fact. The explanatory note above the buttons stays
+  // visible permanently (not hidden after picking a category) so it keeps
+  // explaining the flow to anyone landing on this page fresh.
   ['takePhotoLabel','chooseFileLabel'].forEach(id=>{
     const label = document.getElementById(id);
     if(!label) return;
