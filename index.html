@@ -2336,21 +2336,49 @@ function attachImageZoom(img, zoomFactor){
   const lens = document.createElement('div');
   lens.className = 'zoom-lens';
   wrap.appendChild(lens);
+  // The <img> box itself can be bigger than the actual photo pixels shown
+  // inside it — e.g. the AI Camera zoom modal uses object-fit:contain with
+  // a max-height, which letterboxes (adds empty top/bottom or left/right
+  // bars) whenever the photo's own aspect ratio doesn't match the box's.
+  // Without accounting for that, mouse position gets mapped onto the wrong
+  // part of the photo — correct only in the one region where the box and
+  // the visible photo happen to line up, distorted/cut off everywhere else
+  // (exactly the "works for a limited area only" symptom). This computes
+  // the real on-screen rectangle the photo occupies, so the lens tracks
+  // correctly all the way to every edge.
+  function photoRect(){
+    const box = img.getBoundingClientRect();
+    const nw = img.naturalWidth || box.width;
+    const nh = img.naturalHeight || box.height;
+    const boxRatio = box.width / box.height;
+    const imgRatio = nw / nh;
+    let w, h, left, top;
+    if(imgRatio > boxRatio){
+      w = box.width; h = w / imgRatio;
+      left = box.left; top = box.top + (box.height - h)/2;
+    } else {
+      h = box.height; w = h * imgRatio;
+      top = box.top; left = box.left + (box.width - w)/2;
+    }
+    return {left, top, width:w, height:h};
+  }
   function move(clientX, clientY){
-    const rect = wrap.getBoundingClientRect();
+    const rect = photoRect();
     const x = clientX - rect.left, y = clientY - rect.top;
     if(x<0 || y<0 || x>rect.width || y>rect.height){ lens.style.display='none'; return; }
     lens.style.display = 'block';
+    const wrapRect = wrap.getBoundingClientRect();
     const lw = lens.offsetWidth, lh = lens.offsetHeight;
-    let lx = x - lw/2, ly = y - lh/2;
-    lx = Math.max(0, Math.min(lx, rect.width - lw));
-    ly = Math.max(0, Math.min(ly, rect.height - lh));
+    let lx = (rect.left - wrapRect.left) + x - lw/2;
+    let ly = (rect.top - wrapRect.top) + y - lh/2;
+    lx = Math.max(0, Math.min(lx, wrapRect.width - lw));
+    ly = Math.max(0, Math.min(ly, wrapRect.height - lh));
     lens.style.left = lx + 'px';
     lens.style.top = ly + 'px';
     lens.style.backgroundImage = `url('${img.src}')`;
     lens.style.backgroundSize = `${rect.width*zoomFactor}px ${rect.height*zoomFactor}px`;
-    const bgX = -((lx + lw/2) * zoomFactor - lw/2);
-    const bgY = -((ly + lh/2) * zoomFactor - lh/2);
+    const bgX = -(x*zoomFactor - lw/2);
+    const bgY = -(y*zoomFactor - lh/2);
     lens.style.backgroundPosition = `${bgX}px ${bgY}px`;
   }
   wrap.addEventListener('mousemove', e => move(e.clientX, e.clientY));
