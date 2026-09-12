@@ -744,6 +744,11 @@ const PRODUCTS = [
   {id:'p87', name:'A4 Ruled Notebooks (Pack of 10)', cat:'stationery', price:349, mrp:499},
   {id:'p88', name:'Gel Pens Combo Pack (Set of 20)', cat:'stationery', price:199, mrp:299},
   {id:'p89', name:'Office Desk Organizer with Drawers', cat:'stationery', price:899, mrp:1299},
+  {id:'p90', name:'Stainless Steel Water Bottle (1 Litre)', cat:'sports', price:349, mrp:549},
+  {id:'p91', name:'Insulated Steel Bottle — 24 Hrs Hot & Cold (750ml)', cat:'sports', price:599, mrp:899},
+  {id:'p92', name:'Glass Water Bottle Set (Pack of 3)', cat:'grocery', price:449, mrp:699},
+  {id:'p93', name:'Kids Sipper Water Bottle with Straw (600ml)', cat:'toys', price:249, mrp:399},
+  {id:'p94', name:'Sports Sipper Bottle with Shaker Ball (700ml)', cat:'sports', price:279, mrp:449},
 ];
 PRODUCTS.forEach((p,i)=>{ p.img = svgPlaceholder(p.name.split(' ').slice(0,2).join(' '), PALETTE_BG[i%PALETTE_BG.length], '#ffffff'); p.rating=(3.7+ (i%5)*0.25).toFixed(1); });
 
@@ -2019,6 +2024,16 @@ function renderSearch(q){
   let items = PRODUCTS.filter(matchesAll);
   if(items.length === 0) items = PRODUCTS.filter(matchesAny);
   const navRedirect = items.length === 0 ? findNavRedirect(tokens) : null;
+  // Howitlooks' own demo catalog is only ever going to cover a slice of
+  // everything real stores sell — there's no free way to mirror every
+  // product from every store live. So instead of dead-ending on "No
+  // matches" for anything outside that catalog, every search also gets
+  // real, working search links straight to each partner store's own (much
+  // bigger) catalog for the exact same query — that's what actually makes
+  // "search for anything, find it somewhere" true, at zero cost.
+  const storeSearchLinks = Object.keys(PARTNER_LINK_BUILDERS).map(name => ({
+    name, url: PARTNER_LINK_BUILDERS[name](q)
+  }));
   return `
   <div class="section-title"><h2>Search results for "${q}"</h2><span class="pill">${items.length} found</span></div>
   ${navRedirect ? `
@@ -2026,8 +2041,32 @@ function renderSearch(q){
     <div><b>Looking for this instead?</b><div style="font-size:13px;opacity:.92">"${q}" isn't a product, but Howitlooks has a page for that.</div></div>
     <button class="btn" style="background:#fff;color:var(--brand)" onclick="goTo('${navRedirect.hash}')">${navRedirect.label} →</button>
   </div>` : ''}
-  <div class="grid products">${items.length? items.map(productCard).join('') : (navRedirect ? '' : `<div class="empty-state">No matches. Try "shirt", "phone", "sofa"...</div>`)}</div>
+  ${items.length ? `<div class="grid products">${items.map(productCard).join('')}</div>` : ''}
+  <div class="card" style="padding:16px;margin-top:${items.length?'18px':'0'}">
+    <div style="font-weight:800;margin-bottom:4px">${items.length ? "🔎 Not what you wanted? Search all these stores too" : `😕 "${q}" isn't in Howitlooks' own demo catalog yet`}</div>
+    <div style="font-size:12.5px;color:var(--text-secondary);margin-bottom:10px">${items.length
+      ? `Every partner store below has far more listed than Howitlooks' own demo catalog — search "${q}" directly on any of them:`
+      : `But every real store below has its own full catalog — search "${q}" directly on any of them and it'll very likely be there:`}</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      ${storeSearchLinks.map(s=>`<a class="btn sm" href="${s.url}" target="_blank" rel="noopener sponsored">${s.name}</a>`).join('')}
+    </div>
+  </div>
   `;
+}
+// Picks a real, working outbound search link for a product — the first
+// partner store in that product's category that Howitlooks knows how to
+// build a search URL for (Amazon, Flipkart, Myntra, Meesho, Snapdeal,
+// Ajio), falling back to Amazon so this always resolves to something.
+function storeLinkFor(p){
+  const brands = BRANDS_BY_CATEGORY[p.cat] || [];
+  for(const b of brands){
+    // Category lists spell Amazon several ways ("Amazon.in", "Amazon
+    // Fashion", "Amazon Fresh", "Amazon Pharmacy") — treat all of those as
+    // the one Amazon link builder instead of skipping past them.
+    const key = /^amazon/i.test(b.name) ? 'Amazon' : b.name;
+    if(PARTNER_LINK_BUILDERS[key]) return PARTNER_LINK_BUILDERS[key](p.name);
+  }
+  return amazonLink(p.name);
 }
 function productCard(p){
   return `
@@ -2040,7 +2079,7 @@ function productCard(p){
       <div class="price">${fmt(p.price)}<span class="mrp">${fmt(p.mrp)}</span></div>
       <div class="btnrow">
         <button class="btn sm" onclick="location.hash='#/product/${p.id}'">View</button>
-        <button class="btn sm secondary" onclick="addToCart('${p.id}')">🛒 Add</button>
+        <a class="btn sm secondary" style="display:inline-block;text-align:center" href="${storeLinkFor(p)}" target="_blank" rel="noopener sponsored" onclick="event.stopPropagation()">🛒 Buy →</a>
       </div>
     </div>
   </div>`;
@@ -2066,7 +2105,7 @@ function dealCard(p){
       </div>
       <div class="btnrow" style="margin-top:8px">
         <button class="btn sm" onclick="location.hash='#/product/${p.id}'">View</button>
-        <button class="btn sm secondary" onclick="addToCart('${p.id}')">🛒 Add</button>
+        <a class="btn sm secondary" style="display:inline-block;text-align:center" href="${storeLinkFor(p)}" target="_blank" rel="noopener sponsored" onclick="event.stopPropagation()">🛒 Buy →</a>
       </div>
     </div>
   </div>`;
