@@ -2,9 +2,9 @@
 <html lang="en" data-theme="light">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0"> 
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Howitlooks — Instant AR Shopping</title>
-<meta name="description" content="Snap a photo, preview it instantly, compare prices, find hospitals, jobs, government schemes, ..."> 
+<meta name="description" content="Snap a photo, preview it instantly, compare prices, find hospitals, jobs, government schemes, ...">
 <meta name="theme-color" content="#1a73e8">
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="icon-192.png">
@@ -504,7 +504,7 @@ function icon(name){ return `<svg viewBox="0 0 24 24" fill="none" stroke="curren
 
 const NAV = [
   {id:'home', label:'Home', icon:'home'},
-  {id:'deals', label:"Today's Deals", icon:'flame'},
+  {id:'deals', label:"See Low Affordable Prices & Compare", icon:'flame'},
   {id:'ai-camera', label:'AI Camera', icon:'camera'},
   {id:'price-compare', label:'Price Compare', icon:'tag'},
   {id:'hospitals', label:'Hospitals', icon:'health'},
@@ -1866,6 +1866,18 @@ function renderDeals(){
   const all = [...PRODUCTS].sort((a,b)=>b.discountPct-a.discountPct);
   return `
   <div class="section-title"><h2>🔥 Low Affordable Prices Today — up to ${MAX_DEAL_DISCOUNT}% off</h2><span class="pill">${all.length} items</span></div>
+  <div class="card" style="padding:14px;margin-bottom:14px">
+    <div style="font-weight:800;margin-bottom:8px;font-size:13px">🔎 Compare prices across stores</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <a class="btn sm" style="background:#eb6834" href="https://www.amazon.in/" target="_blank" rel="noopener sponsored">Amazon</a>
+      <a class="btn sm" style="background:#2a78d6" href="https://www.flipkart.com/" target="_blank" rel="noopener sponsored">Flipkart</a>
+      <a class="btn sm" style="background:#e34948" href="https://www.myntra.com/" target="_blank" rel="noopener sponsored">Myntra</a>
+      <a class="btn sm" style="background:#4a3aa7" href="https://www.meesho.com/" target="_blank" rel="noopener sponsored">Meesho</a>
+      <a class="btn sm" style="background:#e87ba4" href="https://www.snapdeal.com/" target="_blank" rel="noopener sponsored">Snapdeal</a>
+      <a class="btn sm" style="background:#1baf7a" href="https://www.ajio.com/" target="_blank" rel="noopener sponsored">Ajio</a>
+      <button type="button" class="btn sm secondary" onclick="goTo('#/price-compare')">Full Price Compare →</button>
+    </div>
+  </div>
   <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Prices and coupon codes both refresh automatically every day (today: ${DAILY_KEY}) — sorted biggest discount first. Tap "Copy" on any coupon, then use it at checkout.</div>
   <div class="grid products">${all.map(dealCard).join('')}</div>
   `;
