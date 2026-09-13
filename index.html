@@ -2596,6 +2596,13 @@ function renderAICamera(){
       <div style="font-size:12.5px;font-weight:800;color:var(--brand)">💡 For the best results</div>
       <div style="font-size:12.5px;font-weight:700;color:var(--text-secondary);margin-top:4px">Upload a straight-on, front-facing photo of the product on a plain background. This demo creates the preview grid by visually transforming your one photo (rotating, flipping, cropping, re-lighting it) — it does not generate brand-new 3D views of sides not visible in your original photo. That's why tiles are named for their visual style (e.g. "Warm Tone," "Mirrored Style") rather than claiming to be a specific camera angle like "Back" or "Left Side" — they're variations of your one photo, not real alternate views.</div>
     </div>
+    <div class="card" style="padding:14px;margin:4px 0 14px;background:var(--surface-2);border:1px solid var(--border)">
+      <div style="font-size:12.5px;font-weight:800;color:var(--brand);margin-bottom:8px">🎥 See it in action</div>
+      <video controls playsinline preload="metadata" style="width:100%;border-radius:10px;background:#000;display:block">
+        <source src="ai-camera-demo.mp4" type="video/mp4">
+        Your browser doesn't support embedded video.
+      </video>
+    </div>
     <label style="text-align:left;margin-top:0">1. What kind of product is it?</label>
     <div class="tabs" style="flex-wrap:wrap;gap:6px" id="categoryChips">
       ${UPLOAD_CATEGORIES.map(c=>`<button type="button" class="${state.uploadedCategory===c.query?'active':''}" onclick="selectUploadCategory('${c.query}')">${c.label}</button>`).join('')}
