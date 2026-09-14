@@ -1106,7 +1106,6 @@ const state = {
   cart:[],
   route:'home',
   uploadedImage:null,
-  uploadedCategory:'',
   uploadedDescription:'',
   resultTab:'angles',
   loginDemoLang:'en',
@@ -1129,18 +1128,6 @@ const state = {
   priceOverrides:{},   // {productId: simulatedCurrentPrice} — demo-only, see renderPriceWatch()
 };
 
-/* Manual category chips stand in for the "AI identifies your product" step
-   (Type/Color/Style) since no real image-recognition model runs in this
-   prototype. Picking one still produces genuine, working search-result
-   links on each retailer's own site — only the "which category" part is
-   chosen by the user instead of detected automatically. */
-const UPLOAD_CATEGORIES = [
-  {label:'Shoes', query:'shoes'}, {label:'Dress / Clothing', query:'dress'},
-  {label:'Bag', query:'handbag'}, {label:'Watch', query:'watch'},
-  {label:'Furniture', query:'furniture'}, {label:'Electronics', query:'electronics'},
-  {label:'Appliances (Fridge, AC, etc.)', query:'refrigerator'}, {label:'Mobile / Gadget', query:'mobile phone'},
-  {label:'Jewellery', query:'jewellery'}, {label:'Other', query:'trending products'},
-];
 
 function toggleTheme(){
   state.theme = state.theme==='light' ? 'dark' : 'light';
@@ -2530,9 +2517,28 @@ const SIMILAR_TIERS = [
   {tag:'⭐ Top rated', mult:1.9}, {tag:'⭐ Premium', mult:2.3},
   {tag:'⭐ Luxury pick', mult:3.0},
 ];
-const CATEGORY_BASE_PRICE = { shoes:1899, dress:1299, handbag:2199, watch:2499, furniture:4999, electronics:3499, refrigerator:15999, 'mobile phone':12999, jewellery:3999, 'trending products':999 };
-function similarProductsFor(query, priceKey){
-  const base = CATEGORY_BASE_PRICE[priceKey] || 1499;
+// No category chips anymore — this is the only signal we have about the
+// product's likely price range, so it's a best-effort keyword guess purely
+// for showing plausible demo price tiers. It never affects which stores or
+// search terms are used (that's always exactly what the user typed/said).
+const PRICE_GUESS_TABLE = [
+  [['tv','television'], 24999], [['fridge','refrigerator'], 15999],
+  [['ac','air conditioner','airconditioner'], 28999], [['washing machine','washer'], 17999],
+  [['laptop','notebook'], 39999], [['mobile','phone','smartphone','iphone'], 12999],
+  [['watch'], 2499], [['shoe','sneaker','sandal','footwear'], 1899],
+  [['bag','handbag','backpack'], 2199], [['dress','shirt','kurti','saree','clothing'], 1299],
+  [['sofa','furniture','table','chair','bed','cupboard','wardrobe'], 4999],
+  [['jewellery','jewelry','necklace','earring','ring'], 3999],
+];
+function guessBasePrice(desc){
+  const d = (desc||'').toLowerCase();
+  for(const [keys, price] of PRICE_GUESS_TABLE){
+    if(keys.some(k=>d.includes(k))) return price;
+  }
+  return 1499;
+}
+function similarProductsFor(query){
+  const base = guessBasePrice(query);
   return SIMILAR_TIERS.map(t=>({
     tag:t.tag,
     price: Math.round(base*t.mult/10)*10,
@@ -2540,33 +2546,21 @@ function similarProductsFor(query, priceKey){
   }));
 }
 function renderSimilarProducts(){
-  const cat = UPLOAD_CATEGORIES.find(c=>c.query===state.uploadedCategory) || UPLOAD_CATEGORIES[UPLOAD_CATEGORIES.length-1];
-  // "Other" has no real product word behind it (there's nothing honest to
-  // search for), so rather than fabricate store links against a vague
-  // placeholder term — the exact bug that showed fish oil and digestive
-  // tablets for a fridge photo — say so plainly instead of guessing.
-  if(cat.query === 'trending products'){
+  // The description box is now mandatory before a photo can even be
+  // uploaded (see handleUpload), so this should always be filled in by the
+  // time this renders — this message only shows if that's ever bypassed.
+  const desc = (state.uploadedDescription||'').trim();
+  if(!desc){
     return `<div class="card" style="padding:16px;margin-top:14px">
       <div style="font-weight:800;margin-bottom:4px">🔎 Similar products in other stores</div>
-      <div style="font-size:13px;color:var(--text-secondary)">"Other" doesn't tell us enough to find accurate matches — please go back up and tap the category that's closest to your photo (e.g. Electronics, Appliances) instead, so the results here actually match what you uploaded.</div>
+      <div style="font-size:13px;color:var(--text-secondary)">Please go back up and describe your product first (type it or use the microphone) — that's what we search other stores for.</div>
     </div>`;
   }
-  // A bare category word like "electronics" is far too broad — searching
-  // it returns whatever's generically popular under that category
-  // (kitchen scales, irons, etc.), not anything to do with the specific
-  // product that was actually photographed. Whatever the user typed in
-  // step 2 (e.g. "43 inch Samsung Smart TV") is a real, specific search
-  // term, so it's used for the store links whenever it's filled in —
-  // falling back to the plain category only if it's left blank.
-  const desc = (state.uploadedDescription||'').trim();
-  const searchQuery = desc || cat.query;
-  const items = similarProductsFor(searchQuery, cat.query);
+  const searchQuery = desc;
+  const items = similarProductsFor(searchQuery);
   return `<div class="card" style="padding:16px;margin-top:14px">
     <div style="font-weight:800;margin-bottom:4px">🔎 Similar products in other stores — Amazon, Flipkart, Myntra, Meesho, Snapdeal &amp; Ajio</div>
-    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">${desc
-      ? `Searching for: <b>"${desc}"</b> (category: ${cat.label}).`
-      : `Based on category only: <b>${cat.label}</b> — for accurate matches, go back to step 2 and describe your product (e.g. "43 inch Samsung Smart TV") instead of relying on the category alone, which is too broad.`
-    } Prices are indicative for this demo. Each row has a ready-to-opt coupon code that refreshes daily (today: ${DAILY_KEY}) — tap Copy, then tap a store to see real, live results and apply it at checkout.</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Searching for: <b>"${desc}"</b>. Prices are indicative for this demo. Each row has a ready-to-opt coupon code that refreshes daily (today: ${DAILY_KEY}) — tap Copy, then tap a store to see real, live results and apply it at checkout.</div>
     ${items.map(it=>`
       <div style="padding:10px 0;border-bottom:1px solid var(--border)">
         <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
@@ -2610,17 +2604,16 @@ function renderAICamera(){
         Your browser doesn't support embedded video.
       </video>
     </div>
-    <label style="text-align:left;margin-top:0">1. What kind of product is it?</label>
-    <div class="tabs" style="flex-wrap:wrap;gap:6px" id="categoryChips">
-      ${UPLOAD_CATEGORIES.map(c=>`<button type="button" class="${state.uploadedCategory===c.query?'active':''}" onclick="selectUploadCategory('${c.query}')">${c.label}</button>`).join('')}
+    <label style="text-align:left;margin-top:0">1. Describe it in a few words</label>
+    <div style="font-size:12.5px;color:var(--text-secondary);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:2px 0 8px"><b>✏️ Whatever photo you are about to take or upload below, please type or tap the microphone and say what it is — for example: Shoes, Dress/Clothing, Bag, Watch, Furniture, Electronics, Fridge, AC, Mobile, Jewellery, Table, Chair, etc. — so we can show you matching similar products.</b></div>
+    <div style="display:flex;gap:8px;align-items:stretch">
+      <input type="text" id="productDescInput" value="${(state.uploadedDescription||'').replace(/"/g,'&quot;')}" oninput="state.uploadedDescription=this.value; updateUploadUnlock(); if(state.uploadedImage && typeof renderResultTabs==='function') renderResultTabs();" placeholder="e.g. Shoes, Fridge, Electronics, Furniture, Nike Shoes" style="flex:1;min-width:0;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text-primary);font-size:14px;font-family:inherit">
+      <button type="button" id="micBtn" onclick="startVoiceInput()" title="Tap and speak instead of typing" style="flex:none;width:46px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--brand);font-size:18px;cursor:pointer">🎤</button>
     </div>
-    <label style="text-align:left;margin-top:14px">2. Describe it in a few words</label>
-    <div style="font-size:12.5px;color:var(--text-secondary);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:2px 0 8px"><b>✏️ Whatever photo you are about to take or upload below, please type here what it is — for example: Television, Fridge, Table, Chair, etc. — so we can show you matching similar products.</b></div>
-    <input type="text" id="productDescInput" value="${(state.uploadedDescription||'').replace(/"/g,'&quot;')}" oninput="state.uploadedDescription=this.value; if(state.uploadedImage && typeof renderResultTabs==='function') renderResultTabs();" placeholder="e.g. Television, Fridge, Table, Chair, Nike Shoes" style="width:100%;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text-primary);font-size:14px;font-family:inherit">
-    <label style="text-align:left;margin-top:14px">3. Upload a product photo</label>
-    <div id="uploadHint" style="font-size:12.5px;color:var(--text-secondary);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:2px 0 10px"><b>📝 Note: First select a category and describe your product above, then take or choose your photo — the upload buttons stay greyed out until a category is picked, so Howitlooks always knows what it's matching your photo against.</b></div>
-    <label id="takePhotoLabel" class="btn sm" style="display:inline-block;cursor:pointer;${state.uploadedCategory?'':'opacity:.45;pointer-events:none;'}">📷 Take a Photo<input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handleUpload(event)" style="display:none" ${state.uploadedCategory?'':'disabled'}></label>
-    <label id="chooseFileLabel" class="btn secondary sm" style="display:inline-block;cursor:pointer;margin-left:8px;${state.uploadedCategory?'':'opacity:.45;pointer-events:none;'}">📁 Choose File<input type="file" id="fileInputChoose" accept="image/*" onchange="handleUpload(event)" style="display:none" ${state.uploadedCategory?'':'disabled'}></label>
+    <label style="text-align:left;margin-top:14px">2. Upload a product photo</label>
+    <div id="uploadHint" style="font-size:12.5px;color:var(--text-secondary);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:2px 0 10px"><b>📝 Note: First describe your product above (type it, or tap 🎤 and say it), then take or choose your photo — the upload buttons stay greyed out until you've done that, so Howitlooks always knows what it's matching your photo against.</b></div>
+    <label id="takePhotoLabel" class="btn sm" style="display:inline-block;cursor:pointer;${(state.uploadedDescription||'').trim()?'':'opacity:.45;pointer-events:none;'}">📷 Take a Photo<input type="file" id="fileInput" accept="image/*" capture="environment" onchange="handleUpload(event)" style="display:none" ${(state.uploadedDescription||'').trim()?'':'disabled'}></label>
+    <label id="chooseFileLabel" class="btn secondary sm" style="display:inline-block;cursor:pointer;margin-left:8px;${(state.uploadedDescription||'').trim()?'':'opacity:.45;pointer-events:none;'}">📁 Choose File<input type="file" id="fileInputChoose" accept="image/*" onchange="handleUpload(event)" style="display:none" ${(state.uploadedDescription||'').trim()?'':'disabled'}></label>
     <div id="progWrap" class="progresswrap hidden"><div id="progBar" class="progressbar"></div></div>
     <div id="genStatus" style="font-size:12px;color:var(--text-secondary);margin-top:6px"></div>
 <div id="angleResult" style="margin-top:16px"></div>
@@ -2659,43 +2652,71 @@ const ANGLES = [
   {label:'Macro Detail', css:'transform:scale(3.1) translate(-6%,6%);filter:contrast(1.15) saturate(1.1)'},
   {label:'Dynamic Style', css:'transform:rotate(96deg) scale(1.7);filter:saturate(1.4) hue-rotate(10deg)'},
 ];
-function selectUploadCategory(query){
-  state.uploadedCategory = query;
-  document.querySelectorAll('#categoryChips button').forEach(b=>b.classList.toggle('active', b.textContent.trim()===UPLOAD_CATEGORIES.find(c=>c.query===query).label));
-  // Unlock the upload buttons immediately — they start disabled (see
-  // renderAICamera) so it's impossible to open the file picker before a
-  // category is picked, rather than relying on someone noticing a toast
-  // message after the fact. The explanatory note above the buttons stays
-  // visible permanently (not hidden after picking a category) so it keeps
-  // explaining the flow to anyone landing on this page fresh.
+// Unlocks/relocks the upload buttons live as the description box changes —
+// they start disabled (see renderAICamera) so it's impossible to open the
+// file picker before something's been typed or spoken, rather than relying
+// on someone noticing a toast message after the fact. Runs on every
+// keystroke (via productDescInput's oninput) and right after voice input
+// fills the box in.
+function updateUploadUnlock(){
+  const has = !!(state.uploadedDescription && state.uploadedDescription.trim());
   ['takePhotoLabel','chooseFileLabel'].forEach(id=>{
     const label = document.getElementById(id);
     if(!label) return;
-    label.style.opacity = '';
-    label.style.pointerEvents = '';
+    label.style.opacity = has ? '' : '.45';
+    label.style.pointerEvents = has ? '' : 'none';
     const input = label.querySelector('input[type=file]');
-    if(input) input.disabled = false;
+    if(input) input.disabled = !has;
   });
-  // If a photo was already uploaded, re-render results so the similar-products
-  // links below immediately reflect the newly chosen category.
-  if(state.uploadedImage) runGeneration();
+}
+// Lets someone speak the product description instead of typing it, using
+// the browser's own built-in speech recognition (free, no account/API key
+// needed — Chrome, Edge and most Android browsers support it; Firefox and
+// some others don't, hence the feature-check and friendly fallback below).
+function startVoiceInput(){
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  if(!SR){
+    flashToast('Voice typing isn\'t supported in this browser — please type it instead, or try Chrome');
+    return;
+  }
+  const micBtn = document.getElementById('micBtn');
+  const recognition = new SR();
+  recognition.lang = 'en-IN';
+  recognition.interimResults = false;
+  recognition.maxAlternatives = 1;
+  if(micBtn){ micBtn.textContent = '🔴'; micBtn.disabled = true; }
+  recognition.onresult = e=>{
+    const text = e.results[0][0].transcript;
+    const box = document.getElementById('productDescInput');
+    state.uploadedDescription = text;
+    if(box) box.value = text;
+    updateUploadUnlock();
+    if(state.uploadedImage && typeof renderResultTabs==='function') renderResultTabs();
+  };
+  recognition.onerror = ()=>{
+    flashToast('Didn\'t catch that — please try again or type it instead');
+  };
+  recognition.onend = ()=>{
+    if(micBtn){ micBtn.textContent = '🎤'; micBtn.disabled = false; }
+  };
+  recognition.start();
 }
 function handleUpload(ev){
   const file = ev.target.files[0];
   if(!file) return;
-  // This demo has no real image-recognition — it relies entirely on the
-  // category chip you tap above to know what you uploaded. Skipping that
-  // step used to silently fall back to a meaningless "Other" search, which
-  // is exactly why a fridge photo could come back showing fish oil and
-  // digestive tablets — those have nothing to do with the photo, they were
-  // just top Amazon results for a vague fallback query. Requiring a
-  // category first means the similar-products results always match what
-  // you actually said you uploaded.
-  if(!state.uploadedCategory){
+  // This demo has no real image-recognition — it relies entirely on what
+  // you type or say above to know what you uploaded. Skipping that step
+  // used to silently fall back to a meaningless generic search, which is
+  // exactly why a fridge photo could once come back showing fish oil and
+  // digestive tablets — those had nothing to do with the photo, they were
+  // just top results for a vague fallback query. Requiring a description
+  // first means the similar-products results always match what you
+  // actually said you uploaded.
+  if(!(state.uploadedDescription && state.uploadedDescription.trim())){
     ev.target.value = '';
-    flashToast('Please tap what kind of product this is (above) before uploading — that\'s how Howitlooks knows what to match it against');
-    const chips = document.getElementById('categoryChips');
-    if(chips) chips.scrollIntoView({behavior:'smooth', block:'center'});
+    flashToast('Please describe your product above (type it or tap 🎤) before uploading — that\'s how Howitlooks knows what to match it against');
+    const box = document.getElementById('productDescInput');
+    if(box) box.scrollIntoView({behavior:'smooth', block:'center'});
     return;
   }
   const reader = new FileReader();
