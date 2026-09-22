@@ -836,6 +836,19 @@ function snapdealLink(query){
 function ajioLink(query){
   return `https://www.ajio.com/search/?text=${encodeURIComponent(query)}`;
 }
+// Government Schemes' "View details" used to just flash a fake "Opening…"
+// toast and do nothing — a dead-end exactly like the old Checkout button.
+// There's no real per-scheme detail page in this demo, so instead of
+// guessing at an unverified deep-link URL into myScheme.gov.in's own
+// search (its SPA search isn't documented to accept a URL parameter, and a
+// wrong guess would just be another silent dead link), this searches
+// Google scoped to the two official Government of India scheme portals —
+// a plain, well-documented URL format that's guaranteed to actually work
+// and land on the real, current scheme page.
+function govSchemeLink(schemeName){
+  const q = `${schemeName} site:myscheme.gov.in OR site:india.gov.in`;
+  return `https://www.google.com/search?q=${encodeURIComponent(q)}`;
+}
 // One lookup used everywhere a "Buy on <partner>" button is rendered, so
 // every partner gets a real, working outbound link to that store's own
 // search results for the product — not just Amazon.
@@ -4647,7 +4660,7 @@ function schemeCard(s){
       <div style="font-size:13px;color:var(--text-secondary);margin-top:6px">${s.dept}</div>
       <div style="font-size:12px;margin-top:8px"><b>Eligibility:</b> ${s.eligibility}</div>
       <div style="font-size:12px"><b>Coverage:</b> ${s.state}</div>
-      <button class="btn sm block" style="margin-top:10px" onclick="flashToast('Opening scheme details (demo)')">View details →</button>
+      <a class="btn sm block" style="display:block;text-align:center;box-sizing:border-box" href="${govSchemeLink(s.name)}" target="_blank" rel="noopener">View details →</a>
     </div>`;
 }
 function renderSchemes(){
