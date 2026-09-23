@@ -1141,6 +1141,7 @@ const COLLEGES = [
   {name:'ICAR–Indian Agricultural Research Institute, Delhi (IARI / Pusa)', city:'New Delhi', state:'Delhi', stream:'Agriculture', courses:['B.Sc (Agriculture)','M.Sc','PhD'], entrance:'ICAR AIEEA', hostel:'Yes — on-campus hostel for all students', feeRange:'₹30,000–₹50,000 / year', website:'https://www.iari.res.in'},
 ];
 const EDU_STREAMS = [...new Set(COLLEGES.map(c=>c.stream))].sort();
+const EDU_STATES = [...new Set(COLLEGES.map(c=>c.state))].sort();
 const JOB_SKILLS = [...new Set(JOBS.flatMap(j=>j.skills||[]))].sort();
 const JOB_LOCATIONS = [...new Set(JOBS.map(j=>j.loc))].sort();
 const JOB_ROLES = [...new Set(JOBS.map(j=>j.title))].sort();
@@ -4753,8 +4754,12 @@ function renderEducation(){
     <h2 style="margin:0 0 4px">🎓 Education — Courses, Colleges &amp; Universities</h2>
     <div style="font-size:13px;opacity:.92">${COLLEGES.length} top institutions across India — entrance exam, residential facility &amp; fee structure at a glance.</div>
   </div>
-  <div class="card" style="padding:12px;margin-top:14px">
-    <input id="eduSearchInput" type="text" placeholder="Search by college, university or city…" oninput="filterEducation()" style="width:100%;box-sizing:border-box">
+  <div class="card" style="padding:12px;margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
+    <input id="eduSearchInput" type="text" placeholder="Search by college, university or city…" oninput="filterEducation()" style="flex:1;min-width:200px;box-sizing:border-box">
+    <select id="eduStateSelect" onchange="filterEducation()" style="min-width:160px">
+      <option value="">All States (${COLLEGES.length})</option>
+      ${EDU_STATES.map(s=>`<option value="${s}">${s} (${COLLEGES.filter(c=>c.state===s).length})</option>`).join('')}
+    </select>
   </div>
   <div class="tabs" id="eduTabs" style="margin-top:14px;flex-wrap:wrap">
     <button class="active" data-stream="" onclick="filterEducation(this)">All (${COLLEGES.length})</button>
@@ -4774,8 +4779,10 @@ function filterEducation(btn){
   }
   const activeBtn = tabsWrap.querySelector('button.active');
   const stream = activeBtn ? activeBtn.dataset.stream : '';
+  const selectedState = (document.getElementById('eduStateSelect')||{}).value || '';
   const q = (document.getElementById('eduSearchInput').value||'').trim().toLowerCase();
   let list = stream ? COLLEGES.filter(c=>c.stream===stream) : COLLEGES;
+  if(selectedState) list = list.filter(c=>c.state===selectedState);
   if(q) list = list.filter(c => c.name.toLowerCase().includes(q) || c.city.toLowerCase().includes(q) || c.state.toLowerCase().includes(q));
   document.getElementById('educationTab').innerHTML = list.length ? list.map(collegeCard).join('') : `<div class="card" style="padding:20px;text-align:center;color:var(--muted)">No colleges or universities match your search.</div>`;
 }
