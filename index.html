@@ -498,25 +498,7 @@ const ICONS = {
   ambulance:'<rect x="2" y="9" width="14" height="8" rx="1.5"/><path d="M16 12h4l2 3v2h-6z"/><circle cx="6.5" cy="18.5" r="1.7"/><circle cx="17.5" cy="18.5" r="1.7"/><path d="M7 11v4M5 13h4"/>',
   expand:'<path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M16 3h3a2 2 0 0 1 2 2v3"/><path d="M21 16v3a2 2 0 0 1-2 2h-3"/><path d="M8 21H5a2 2 0 0 1-2-2v-3"/>',
   bell:'<path d="M6 8a6 6 0 0 1 12 0c0 5 2 6 2 6H4s2-1 2-6"/><path d="M10 21a2 2 0 0 0 4 0"/>',
-  flame:'<path d="M12 2c2 4-2 5-2 9a4 4 0 0 0 8 0c0-2-1-3-1-5 3 2 5 6 5 9a8 8 0 0 1-16 0c0-6 4-9 6-13z"/>',
-  grad:'<path d="M2 9l10-5 10 5-10 5-10-5z"/><path d="M6 11v5c0 1.5 3 3 6 3s6-1.5 6-3v-5"/><path d="M22 9v6"/>',
-  /* Category icons for generated product art (see productArt()) */
-  phone:'<rect x="7" y="2" width="10" height="20" rx="2"/><line x1="11" y1="18" x2="13" y2="18"/>',
-  laptop:'<rect x="3" y="4" width="18" height="12" rx="1"/><path d="M2 18h20l-2 3H4z"/>',
-  shirt:'<path d="M8 3l4 2 4-2 4 4-3 3v11H7V10L4 7z"/>',
-  dress:'<path d="M9 3h6l1 5-2 2 3 11H7l3-11-2-2z"/>',
-  sofa:'<path d="M4 12v6h16v-6"/><path d="M4 12a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2"/><path d="M4 18v2M20 18v2"/><rect x="2" y="9" width="4" height="6" rx="1"/><rect x="18" y="9" width="4" height="6" rx="1"/>',
-  shoe:'<path d="M3 17c0-2 2-3 4-4l6-4 2 2 6 1c1 3 0 5-2 5H3z"/>',
-  ring:'<circle cx="12" cy="16" r="4"/><path d="M8 10h8l-4-6z"/><path d="M8 10l4 4 4-4"/>',
-  watch:'<circle cx="12" cy="12" r="6"/><path d="M12 9v3l2 2"/><path d="M9 3h6l-1 4h-4z"/><path d="M9 21h6l-1-4h-4z"/>',
-  bag:'<path d="M6 8h12l1 13H5z"/><path d="M9 8V6a3 3 0 0 1 6 0v2"/>',
-  fridge:'<rect x="6" y="2" width="12" height="20" rx="1.5"/><line x1="6" y1="9" x2="18" y2="9"/><line x1="9" y1="4" x2="9" y2="7"/><line x1="9" y1="11" x2="9" y2="14"/>',
-  book:'<path d="M4 4h8a3 3 0 0 1 3 3v13a2 2 0 0 0-2-2H4z"/><path d="M20 4h-8a3 3 0 0 0-3 3v13a2 2 0 0 1 2-2h9z"/>',
-  basket:'<path d="M4 9h16l-1.5 10a2 2 0 0 1-2 1.8H7.5a2 2 0 0 1-2-1.8z"/><path d="M8 9l1-5M16 9l-1-5"/><line x1="2" y1="9" x2="22" y2="9"/>',
-  sparkle:'<path d="M12 3l1.5 5L18 9l-4.5 1L12 15l-1.5-5L6 9l4.5-1z"/><path d="M18 15l.8 2.2L21 18l-2.2.8L18 21l-.8-2.2L15 18l2.2-.8z"/>',
-  block:'<rect x="4" y="4" width="7" height="7" rx="1"/><rect x="13" y="4" width="7" height="7" rx="1"/><rect x="4" y="13" width="7" height="7" rx="1"/><circle cx="16.5" cy="16.5" r="3.5"/>',
-  ball:'<circle cx="12" cy="12" r="9"/><path d="M12 3c-3 9 3 9 0 18M3 12c9-3 9 3 18 0"/>',
-  pen:'<path d="M4 20l1-4L16 5l3 3L8 19z"/><path d="M14 7l3 3"/>'
+  flame:'<path d="M12 2c2 4-2 5-2 9a4 4 0 0 0 8 0c0-2-1-3-1-5 3 2 5 6 5 9a8 8 0 0 1-16 0c0-6 4-9 6-13z"/>'
 };
 function icon(name){ return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`; }
 
@@ -528,7 +510,6 @@ const NAV = [
   {id:'hospitals', label:'Hospitals', icon:'health'},
   {id:'jobs', label:'Jobs', icon:'brief'},
   {id:'schemes', label:'Govt Schemes', icon:'doc'},
-  {id:'education', label:'Education & Colleges', icon:'grad'},
   {id:'chat', label:'AI Chat', icon:'chat'},
   {id:'premium', label:'Premium', icon:'crown'},
   {id:'admin', label:'Admin', icon:'gear'},
@@ -538,46 +519,6 @@ const NAV = [
 function svgPlaceholder(text, bg, fg){
   const t = encodeURIComponent(text);
   const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'><rect width='100%' height='100%' fill='${bg}'/><text x='50%' y='50%' font-family='system-ui,sans-serif' font-size='22' font-weight='700' fill='${fg}' text-anchor='middle' dominant-baseline='middle'>${text}</text></svg>`;
-  return 'data:image/svg+xml,' + encodeURIComponent(svg);
-}
-/* ---- Product art ----
-   No real product photography exists for this catalog (and using actual
-   Amazon/Flipkart/brand photos would be a copyright/trademark problem
-   since Howitlooks doesn't own or license them), and no AI image-generation
-   tool is available to render a real photo per product either. So instead
-   of the old flat "color box + product name as text" placeholder, each
-   product gets a polished gradient card with a relevant category icon
-   (a phone for Mobiles, a shoe for Footwear, a sofa for Furniture, etc.)
-   — closer to real product art than plain text on a box, with zero
-   copyright risk since nothing here is a real photo. */
-const CATEGORY_ICON = {
-  mobiles:'phone', electronics:'laptop', men:'shirt', women:'dress',
-  furniture:'sofa', footwear:'shoe', jewelry:'ring', watches:'watch',
-  bags:'bag', appliances:'fridge', healthcare:'health', books:'book',
-  grocery:'basket', beauty:'sparkle', toys:'block', sports:'ball',
-  stationery:'pen',
-};
-function shadeColor(hex, percent){
-  hex = hex.replace('#','');
-  const num = parseInt(hex,16);
-  let r = (num>>16), g = (num>>8 & 0x00FF), b = (num & 0x0000FF);
-  r = Math.min(255, Math.max(0, r + Math.round(2.55*percent)));
-  g = Math.min(255, Math.max(0, g + Math.round(2.55*percent)));
-  b = Math.min(255, Math.max(0, b + Math.round(2.55*percent)));
-  return '#' + (0x1000000 + r*0x10000 + g*0x100 + b).toString(16).slice(1);
-}
-function productArt(p, bg){
-  const iconName = CATEGORY_ICON[p.cat] || 'tag';
-  const iconPath = ICONS[iconName] || ICONS.tag;
-  const darker = shadeColor(bg, -20);
-  const gradId = 'pg' + p.id;
-  const svg = `<svg xmlns='http://www.w3.org/2000/svg' width='300' height='300'>
-    <defs><linearGradient id='${gradId}' x1='0' y1='0' x2='1' y2='1'>
-      <stop offset='0' stop-color='${bg}'/><stop offset='1' stop-color='${darker}'/>
-    </linearGradient></defs>
-    <rect width='100%' height='100%' fill='url(#${gradId})'/>
-    <g transform='translate(90,90) scale(5)' fill='none' stroke='#ffffff' stroke-width='1.3' stroke-linecap='round' stroke-linejoin='round' opacity='0.95'>${iconPath}</g>
-  </svg>`;
   return 'data:image/svg+xml,' + encodeURIComponent(svg);
 }
 const CATS = [
@@ -809,7 +750,7 @@ const PRODUCTS = [
   {id:'p93', name:'Kids Sipper Water Bottle with Straw (600ml)', cat:'toys', price:249, mrp:399},
   {id:'p94', name:'Sports Sipper Bottle with Shaker Ball (700ml)', cat:'sports', price:279, mrp:449},
 ];
-PRODUCTS.forEach((p,i)=>{ p.img = productArt(p, PALETTE_BG[i%PALETTE_BG.length]); p.rating=(3.7+ (i%5)*0.25).toFixed(1); });
+PRODUCTS.forEach((p,i)=>{ p.img = svgPlaceholder(p.name.split(' ').slice(0,2).join(' '), PALETTE_BG[i%PALETTE_BG.length], '#ffffff'); p.rating=(3.7+ (i%5)*0.25).toFixed(1); });
 
 /* ---- Daily-refreshing deals engine ----
    No live backend exists in this prototype, so "auto-updates daily" is simulated:
@@ -1154,84 +1095,6 @@ const SCHEMES = [
   {name:'Minority Welfare Scholarship', dept:'Ministry of Minority Affairs', eligibility:'Students from notified minority communities', state:'All India', cat:'Education'},
 ];
 const SCHEME_CATS = [...new Set(SCHEMES.map(s=>s.cat))].sort();
-/* ---------------- Education: Courses, Colleges & Universities ----------------
-   A curated sample of well-known Indian institutions across major streams —
-   not an exhaustive nationwide database (India has thousands of colleges),
-   same demo-data approach as JOBS and SCHEMES above. Entrance exam, hostel
-   and fee-range fields are illustrative summaries; "View details" links go
-   straight to each institution's real official website (rather than a
-   generic search link) so students land on accurate, current admission
-   info directly — always double-check specifics there before applying. */
-const COLLEGES = [
-  {name:'Indian Institute of Technology Bombay (IIT Bombay)', city:'Mumbai', state:'Maharashtra', stream:'Engineering', courses:['B.Tech','M.Tech','PhD'], entrance:'JEE Advanced', hostel:'Yes — on-campus hostels for all students', feeRange:'₹2–2.5 LPA (B.Tech)', website:'https://www.iitb.ac.in'},
-  {name:'Indian Institute of Technology Delhi (IIT Delhi)', city:'New Delhi', state:'Delhi', stream:'Engineering', courses:['B.Tech','M.Tech','PhD'], entrance:'JEE Advanced', hostel:'Yes — on-campus hostels for all students', feeRange:'₹2–2.5 LPA (B.Tech)', website:'https://home.iitd.ac.in'},
-  {name:'Indian Institute of Technology Madras (IIT Madras)', city:'Chennai', state:'Tamil Nadu', stream:'Engineering', courses:['B.Tech','M.Tech','PhD'], entrance:'JEE Advanced', hostel:'Yes — on-campus hostels for all students', feeRange:'₹2–2.5 LPA (B.Tech)', website:'https://www.iitm.ac.in'},
-  {name:'Indian Institute of Technology Kanpur (IIT Kanpur)', city:'Kanpur', state:'Uttar Pradesh', stream:'Engineering', courses:['B.Tech','M.Tech','PhD'], entrance:'JEE Advanced', hostel:'Yes — on-campus hostels for all students', feeRange:'₹2–2.5 LPA (B.Tech)', website:'https://www.iitk.ac.in'},
-  {name:'Indian Institute of Technology Kharagpur (IIT Kharagpur)', city:'Kharagpur', state:'West Bengal', stream:'Engineering', courses:['B.Tech','M.Tech','PhD'], entrance:'JEE Advanced', hostel:'Yes — on-campus hostels for all students', feeRange:'₹2–2.5 LPA (B.Tech)', website:'https://www.iitkgp.ac.in'},
-  {name:'National Institute of Technology Tiruchirappalli (NIT Trichy)', city:'Tiruchirappalli', state:'Tamil Nadu', stream:'Engineering', courses:['B.Tech','M.Tech','PhD'], entrance:'JEE Main', hostel:'Yes — on-campus hostels for all students', feeRange:'₹1.5–1.8 LPA (B.Tech)', website:'https://www.nitt.edu'},
-  {name:'National Institute of Technology Karnataka (NIT Surathkal)', city:'Surathkal', state:'Karnataka', stream:'Engineering', courses:['B.Tech','M.Tech','PhD'], entrance:'JEE Main', hostel:'Yes — on-campus hostels for all students', feeRange:'₹1.5–1.8 LPA (B.Tech)', website:'https://www.nitk.ac.in'},
-  {name:'Birla Institute of Technology and Science, Pilani (BITS Pilani)', city:'Pilani', state:'Rajasthan', stream:'Engineering', courses:['B.E.','M.E.','PhD'], entrance:'BITSAT', hostel:'Yes — compulsory on-campus hostel for all students', feeRange:'₹5–6 LPA', website:'https://www.bits-pilani.ac.in'},
-  {name:'Vellore Institute of Technology (VIT Vellore)', city:'Vellore', state:'Tamil Nadu', stream:'Engineering', courses:['B.Tech','M.Tech','PhD'], entrance:'VITEEE', hostel:'Yes — on-campus hostels available', feeRange:'₹2–2.5 LPA', website:'https://vit.ac.in'},
-  {name:'Delhi Technological University (DTU)', city:'New Delhi', state:'Delhi', stream:'Engineering', courses:['B.Tech','M.Tech','PhD'], entrance:'JEE Main', hostel:'Yes — limited seats, mainly for outstation students', feeRange:'₹1.5–2 LPA', website:'https://www.dtu.ac.in'},
-  {name:'All India Institute of Medical Sciences, Delhi (AIIMS Delhi)', city:'New Delhi', state:'Delhi', stream:'Medical', courses:['MBBS','MD/MS','PhD'], entrance:'NEET UG / NEET PG', hostel:'Yes — on-campus hostel for all students', feeRange:'₹6,000–₹10,000 / year (govt subsidized)', website:'https://www.aiims.edu'},
-  {name:'Jawaharlal Institute of Postgraduate Medical Education & Research (JIPMER)', city:'Puducherry', state:'Puducherry', stream:'Medical', courses:['MBBS','MD/MS','PhD'], entrance:'NEET UG / NEET PG', hostel:'Yes — on-campus hostel for all students', feeRange:'₹25,000–₹40,000 / year (govt subsidized)', website:'https://jipmer.edu.in'},
-  {name:'Christian Medical College, Vellore (CMC Vellore)', city:'Vellore', state:'Tamil Nadu', stream:'Medical', courses:['MBBS','MD/MS','PhD'], entrance:'NEET UG / NEET PG', hostel:'Yes — compulsory on-campus hostel', feeRange:'₹1–1.5 LPA', website:'https://www.cmch-vellore.edu'},
-  {name:'Armed Forces Medical College, Pune (AFMC)', city:'Pune', state:'Maharashtra', stream:'Medical', courses:['MBBS','MD/MS'], entrance:'NEET UG', hostel:'Yes — compulsory on-campus hostel, stipend paid', feeRange:'Nominal (govt/defence subsidized)', website:'https://afmc.nic.in'},
-  {name:'King George\'s Medical University (KGMU), Lucknow', city:'Lucknow', state:'Uttar Pradesh', stream:'Medical', courses:['MBBS','MD/MS','PhD'], entrance:'NEET UG / NEET PG', hostel:'Yes — on-campus hostel for all students', feeRange:'₹40,000–₹60,000 / year (govt subsidized)', website:'https://www.kgmu.org'},
-  {name:'Indian Institute of Management Ahmedabad (IIM Ahmedabad)', city:'Ahmedabad', state:'Gujarat', stream:'Management', courses:['MBA / PGP','PhD (Fellow Programme)'], entrance:'CAT', hostel:'Yes — compulsory on-campus residency', feeRange:'₹25–27 LPA (2-year PGP)', website:'https://www.iima.ac.in'},
-  {name:'Indian Institute of Management Bangalore (IIM Bangalore)', city:'Bengaluru', state:'Karnataka', stream:'Management', courses:['MBA / PGP','PhD (Fellow Programme)'], entrance:'CAT', hostel:'Yes — compulsory on-campus residency', feeRange:'₹24–26 LPA (2-year PGP)', website:'https://www.iimb.ac.in'},
-  {name:'Indian Institute of Management Calcutta (IIM Calcutta)', city:'Kolkata', state:'West Bengal', stream:'Management', courses:['MBA / PGP','PhD (Fellow Programme)'], entrance:'CAT', hostel:'Yes — compulsory on-campus residency', feeRange:'₹24–27 LPA (2-year PGP)', website:'https://www.iimcal.ac.in'},
-  {name:'XLRI Xavier School of Management, Jamshedpur', city:'Jamshedpur', state:'Jharkhand', stream:'Management', courses:['MBA (BM/HRM)','PhD'], entrance:'XAT', hostel:'Yes — on-campus hostel for most students', feeRange:'₹23–25 LPA', website:'https://www.xlri.ac.in'},
-  {name:'Faculty of Management Studies, Delhi University (FMS Delhi)', city:'New Delhi', state:'Delhi', stream:'Management', courses:['MBA'], entrance:'CAT', hostel:'Limited — Delhi University hostels, competitive seats', feeRange:'₹20,000–₹25,000 total (2-year, govt subsidized)', website:'https://fms.edu'},
-  {name:'S.P. Jain Institute of Management & Research, Mumbai (SPJIMR)', city:'Mumbai', state:'Maharashtra', stream:'Management', courses:['MBA (PGDM)'], entrance:'CAT / GMAT', hostel:'Limited — on-campus hostel, some students find own housing', feeRange:'₹22–24 LPA', website:'https://www.spjimr.org'},
-  {name:'National Law School of India University, Bangalore (NLSIU)', city:'Bengaluru', state:'Karnataka', stream:'Law', courses:['BA LLB (Hons)','LLM','PhD'], entrance:'CLAT', hostel:'Yes — compulsory on-campus hostel for all students', feeRange:'₹2.8–3 LPA', website:'https://www.nls.ac.in'},
-  {name:'NALSAR University of Law, Hyderabad', city:'Hyderabad', state:'Telangana', stream:'Law', courses:['BA LLB (Hons)','LLM','PhD'], entrance:'CLAT', hostel:'Yes — on-campus hostel for all students', feeRange:'₹2.5–3 LPA', website:'https://www.nalsar.ac.in'},
-  {name:'National Law University, Delhi (NLU Delhi)', city:'New Delhi', state:'Delhi', stream:'Law', courses:['BA LLB (Hons)','LLM','PhD'], entrance:'AILET (own entrance exam)', hostel:'Yes — on-campus hostel, limited seats', feeRange:'₹1.5–2 LPA', website:'https://nludelhi.ac.in'},
-  {name:'St. Stephen\'s College, Delhi University', city:'New Delhi', state:'Delhi', stream:'Arts & Science', courses:['BA (Hons)','B.Sc (Hons)'], entrance:'CUET + college interview', hostel:'Limited — mainly for outstation students', feeRange:'₹15,000–₹25,000 / year (govt subsidized)', website:'https://www.ststephens.edu'},
-  {name:'Shri Ram College of Commerce, Delhi University (SRCC)', city:'New Delhi', state:'Delhi', stream:'Commerce', courses:['B.Com (Hons)','B.A. Economics (Hons)'], entrance:'CUET', hostel:'No — day college, no hostel on campus', feeRange:'₹15,000–₹20,000 / year (govt subsidized)', website:'https://www.srcc.edu'},
-  {name:'Presidency University, Kolkata', city:'Kolkata', state:'West Bengal', stream:'Arts & Science', courses:['BA/B.Sc (Hons)','MA/M.Sc'], entrance:'CUET / state merit', hostel:'Limited — a few seats, mostly for outstation students', feeRange:'₹10,000–₹20,000 / year (govt subsidized)', website:'https://www.presiuniv.ac.in'},
-  {name:'Christ University, Bangalore', city:'Bengaluru', state:'Karnataka', stream:'Arts & Science', courses:['BA/B.Sc/B.Com','MBA','Law'], entrance:'CUET / Christ University Entrance Test', hostel:'Yes — on-campus hostels for men and women', feeRange:'₹1–3 LPA (varies by course)', website:'https://christuniversity.in'},
-  {name:'Loyola College, Chennai', city:'Chennai', state:'Tamil Nadu', stream:'Arts & Science', courses:['BA/B.Sc/B.Com','MA/M.Sc'], entrance:'CUET / merit-based', hostel:'Yes — on-campus hostel available', feeRange:'₹20,000–₹40,000 / year', website:'https://www.loyolacollege.edu'},
-  {name:'National Institute of Design, Ahmedabad (NID)', city:'Ahmedabad', state:'Gujarat', stream:'Design', courses:['B.Des','M.Des','PhD'], entrance:'NID DAT (Design Aptitude Test)', hostel:'Yes — on-campus hostel for most students', feeRange:'₹4–5 LPA', website:'https://www.nid.edu'},
-  {name:'School of Planning and Architecture, Delhi (SPA Delhi)', city:'New Delhi', state:'Delhi', stream:'Architecture', courses:['B.Arch','M.Arch','B.Planning'], entrance:'JEE Main (Paper 2) / NATA', hostel:'Yes — on-campus hostel, limited seats', feeRange:'₹1–1.5 LPA', website:'https://spa.ac.in'},
-  {name:'Jamia Hamdard, Delhi', city:'New Delhi', state:'Delhi', stream:'Pharmacy', courses:['B.Pharm','M.Pharm','PharmD'], entrance:'GPAT / own entrance test', hostel:'Yes — on-campus hostel for men and women', feeRange:'₹1.5–2 LPA', website:'https://jamiahamdard.edu'},
-  {name:'ICAR–Indian Agricultural Research Institute, Delhi (IARI / Pusa)', city:'New Delhi', state:'Delhi', stream:'Agriculture', courses:['B.Sc (Agriculture)','M.Sc','PhD'], entrance:'ICAR AIEEA', hostel:'Yes — on-campus hostel for all students', feeRange:'₹30,000–₹50,000 / year', website:'https://www.iari.res.in'},
-];
-const EDU_STREAMS = [...new Set(COLLEGES.map(c=>c.stream))].sort();
-const EDU_STATES = [...new Set(COLLEGES.map(c=>c.state))].sort();
-/* ---------------- Scholarships ----------------
-   A curated sample of real scholarship programmes — central & state
-   government, statutory bodies (AICTE/UGC/DST) and private/corporate
-   philanthropy — not an exhaustive database (thousands of scholarships
-   exist). "Apply / Learn more" links go to each provider's real official
-   portal; for the many private/corporate scholarships run through a
-   listing platform rather than each company's own site, that platform's
-   real official site is used instead of guessing a corporate CSR URL. */
-const SCHOLARSHIPS = [
-  {name:'National Scholarship Portal (NSP) — umbrella for 50+ Central & State schemes', provider:'Ministry of Education, Govt of India', type:'Central Govt', eligibility:'Varies by scheme — covers class 1 to PhD students; most require a valid Aadhaar-linked bank account and family income proof', howToApply:'Register and apply online at the National Scholarship Portal; renew every year to continue receiving it', website:'https://scholarships.gov.in'},
-  {name:'Central Sector Scheme of Scholarship for College & University Students', provider:'Ministry of Education', type:'Central Govt', eligibility:'Top 20th percentile in Class 12 boards, family income below ₹4.5 LPA, pursuing regular degree/diploma courses', howToApply:'Apply online via the National Scholarship Portal (NSP) during the annual application window', website:'https://scholarships.gov.in'},
-  {name:'Post-Matric Scholarship for SC Students', provider:'Ministry of Social Justice & Empowerment', type:'Central Govt', eligibility:'SC students studying post-Class 10, family income within prescribed limit', howToApply:'Apply online via the National Scholarship Portal (NSP)', website:'https://scholarships.gov.in'},
-  {name:'Post-Matric Scholarship for OBC Students', provider:'Ministry of Social Justice & Empowerment', type:'Central Govt', eligibility:'OBC students studying post-Class 10, family income within prescribed limit', howToApply:'Apply online via the National Scholarship Portal (NSP)', website:'https://scholarships.gov.in'},
-  {name:'Pre-Matric & Post-Matric Scholarship for Minorities', provider:'Ministry of Minority Affairs', type:'Central Govt', eligibility:'Students from notified minority communities (Muslim, Christian, Sikh, Buddhist, Parsi, Jain), family income within prescribed limit', howToApply:'Apply online via the National Scholarship Portal (NSP)', website:'https://scholarships.gov.in'},
-  {name:'National Means-cum-Merit Scholarship (NMMS)', provider:'Ministry of Education (state-implemented)', type:'Central Govt', eligibility:'Class 9 students from economically weaker sections who clear the state NMMS selection test; continues through Class 12', howToApply:'Apply through your State Education Department / school, or via NSP', website:'https://scholarships.gov.in'},
-  {name:'AICTE Pragati Scholarship for Girls', provider:'All India Council for Technical Education (AICTE)', type:'AICTE', eligibility:'Girl students (max 2 per family) in AICTE-approved diploma/degree technical colleges, family income below ₹8 LPA', howToApply:'Apply online through the AICTE Pragati/Saksham portal, linked from the AICTE website', website:'https://www.aicte-india.org'},
-  {name:'AICTE Saksham Scholarship for Differently-Abled Students', provider:'All India Council for Technical Education (AICTE)', type:'AICTE', eligibility:'Differently-abled students (40%+ disability) in AICTE-approved diploma/UG technical colleges, family income below ₹8 LPA — up to ₹50,000/year', howToApply:'Apply online through the AICTE Pragati/Saksham portal, linked from the AICTE website', website:'https://www.aicte-india.org'},
-  {name:'Bharathi Cement Fresh & Renewal Scholarship 2026', provider:'Bharathi Cement Corporation', type:'Private / Corporate', eligibility:'Class 11 to postgraduate students; award up to ₹40,000 depending on course and merit', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/bharathi-cement-fresh-and-renewal-scholarship/'},
-  {name:'Reliance Foundation Undergraduate Scholarship 2026-27', provider:'Reliance Foundation', type:'Private / Corporate', eligibility:'Students entering the 1st year of an undergraduate course, merit-cum-means based; award up to ₹2 lakhs', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/reliance-foundation-undergraduate-scholarship-2026-27/'},
-  {name:'Reliance Foundation Postgraduate Scholarship for Engineering Students 2026', provider:'Reliance Foundation', type:'Private / Corporate', eligibility:'Students pursuing a PG engineering course, merit-cum-means based; award up to ₹6 lakhs', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/reliance-foundation-scholarship-for-pg-students/'},
-  {name:'Raman Kant Munjal Scholarship 2026', provider:'Raman Kant Munjal Foundation', type:'Private / Corporate', eligibility:'Students entering the 1st year of an undergraduate course, merit-cum-means based; award up to ₹5.5 lakhs', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/raman-kant-munjal-scholarships/'},
-  {name:'Eastman PowerUp EduSkill Scholarship 2026', provider:'Eastman Chemical Company (CSR programme)', type:'Private / Corporate', eligibility:'Diploma, UG and PG students; award up to ₹20,000', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/eastman-powerup-eduskill-scholarship/'},
-  {name:'Mahindra EmpowerHer Scholarship Program 2026', provider:'K.C. Mahindra Education Trust', type:'Private / Corporate', eligibility:'Girl students only, Class 9 to postgraduate; award around ₹5,500', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/mahindra-empowerher-scholarship-program/'},
-  {name:'Malabar Charitable Trust Scholarship 2026', provider:'Malabar Charitable Trust', type:'Private / Corporate', eligibility:'Girl students only, studying in Class 11 or 12; award based on actual course fees', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/malabar-charitable-trust-scholarship/'},
-  {name:'Indiabulls Foundation Education Support Scholarship 2026', provider:'Indiabulls Foundation', type:'Private / Corporate', eligibility:'Undergraduate students from economically weaker backgrounds; award based on actual course fees', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/indiabulls-foundation-education-support-scholarship/'},
-  {name:'INSPIRE Scholarship for Higher Education', provider:'Department of Science & Technology (DST)', type:'Central Govt', eligibility:'Top 1% in Class 12 boards (or top rankers in national exams) pursuing B.Sc/M.Sc/Integrated M.Sc in natural or basic sciences', howToApply:'Apply online via the INSPIRE portal', website:'https://online-inspire.gov.in'},
-  {name:'Maulana Azad National Fellowship', provider:'University Grants Commission (UGC)', type:'UGC', eligibility:'Students from notified minority communities pursuing M.Phil or PhD at a recognized university', howToApply:'Apply through the UGC National Fellowship portal, linked from the UGC website', website:'https://www.ugc.gov.in'},
-  {name:'Kalpana Chawla Scholarship for Girls in Technical Education', provider:'Haryana State Government', type:'State Govt', eligibility:'Girl students domiciled in Haryana pursuing engineering/technical diploma or degree courses, family income within prescribed limit', howToApply:'Apply via the Haryana state scholarship portal / National Scholarship Portal (NSP)', website:'https://scholarships.gov.in'},
-  {name:'Vidyasaarathi — Corporate & Trust Scholarships', provider:'Multiple companies & trusts (via NSDL-backed platform)', type:'Private / Corporate', eligibility:'Varies by individual scholarship listed — spans school to postgraduate and professional courses', howToApply:'Browse live scholarships and apply directly on the Vidyasaarathi platform', website:'https://www.vidyasaarathi.co.in'},
-  {name:'Buddy4Study — Private & Corporate Scholarship Listings', provider:'Multiple companies, banks & foundations (via Buddy4Study platform)', type:'Private / Corporate', eligibility:'Varies by individual scholarship listed — spans school, undergraduate, postgraduate and professional courses', howToApply:'Search and apply directly through listings on the Buddy4Study platform', website:'https://www.buddy4study.com'},
-  {name:'Tata Trusts Scholarship Programmes', provider:'Tata Trusts', type:'Private / Corporate', eligibility:'Meritorious students from low-income families pursuing higher education, varies by individual programme', howToApply:'Check current open programmes and apply via the Tata Trusts website', website:'https://www.tatatrusts.org'},
-];
-const SCHOLARSHIP_TYPES = [...new Set(SCHOLARSHIPS.map(s=>s.type))].sort();
 const JOB_SKILLS = [...new Set(JOBS.flatMap(j=>j.skills||[]))].sort();
 const JOB_LOCATIONS = [...new Set(JOBS.map(j=>j.loc))].sort();
 const JOB_ROLES = [...new Set(JOBS.map(j=>j.title))].sort();
@@ -1448,7 +1311,6 @@ function render(){
     'hospitals': renderHospitals,
     'jobs': renderJobs,
     'schemes': renderSchemes,
-    'education': ()=>renderEducation(parts[1]),
     'chat': renderChat,
     'premium': renderPremium,
     'admin': ()=>renderAdmin(parts[1]||'dashboard'),
@@ -1924,7 +1786,6 @@ const FEATURE_HIGHLIGHTS = [
   {label:'Hospitals', desc:'Cheapest by condition', icon:'health', color:'#e34948', route:'#/hospitals'},
   {label:'Jobs & Resume', desc:'Govt + private listings', icon:'brief', color:'#eda100', route:'#/jobs'},
   {label:'Govt Schemes', desc:'Check your eligibility', icon:'doc', color:'#4a3aa7', route:'#/schemes'},
-  {label:'Education & Colleges', desc:'Courses, entrance exams & fees', icon:'grad', color:'#1b8fa0', route:'#/education'},
   {label:'AI Chat Assistant', desc:'Ask about anything', icon:'chat', color:'#e87ba4', route:'#/chat'},
   {label:'Price Watch', desc:'Get alerted on price drops', icon:'bell', color:'#d64545', route:'#/price-watch'},
   {label:'Go Premium', desc:'Unlimited AI + AR', icon:'crown', color:'#008300', route:'#/premium'},
@@ -2063,8 +1924,6 @@ const NAV_SEARCH_REDIRECTS = [
   {keywords:['resume','cv'], label:'📝 Resume Builder', hash:'#/jobs'},
   {keywords:['job','jobs','career','careers','vacancy','vacancies'], label:'💼 Job Search', hash:'#/jobs'},
   {keywords:['scheme','schemes','government','govt'], label:'🏛️ Government Schemes', hash:'#/schemes'},
-  {keywords:['college','colleges','university','universities','education','course','courses','admission','admissions','entrance'], label:'🎓 Education — Colleges & Universities', hash:'#/education/colleges'},
-  {keywords:['scholarship','scholarships','financial aid','stipend'], label:'💰 Education — Scholarships', hash:'#/education/scholarships'},
   {keywords:['price','prices','compare','comparison'], label:'💰 Price Compare Hub', hash:'#/price-compare'},
   {keywords:['plan','plans','premium','pricing','subscription','subscriptions','upgrade'], label:'👑 Plans & Pricing', hash:'#/premium'},
   {keywords:['cart','basket'], label:'🛒 Your Cart', hash:'#/cart'},
@@ -4827,114 +4686,12 @@ function filterSchemes(btn, cat){
   document.getElementById('schemesTab').innerHTML = list.map(schemeCard).join('');
 }
 
-function collegeCard(c){
-  return `
-    <div class="card" style="padding:14px">
-      <div style="display:flex;justify-content:space-between;gap:8px"><b>${c.name}</b><span class="pill" style="flex-shrink:0">${c.stream}</span></div>
-      <div style="font-size:13px;color:var(--text-secondary);margin-top:6px">${c.city}, ${c.state}</div>
-      <div style="font-size:12px;margin-top:8px"><b>Courses:</b> ${c.courses.join(', ')}</div>
-      <div style="font-size:12px"><b>Entrance exam:</b> ${c.entrance}</div>
-      <div style="font-size:12px"><b>Residential facility:</b> ${c.hostel}</div>
-      <div style="font-size:12px"><b>Approx. fee:</b> ${c.feeRange}</div>
-      <a class="btn sm block" style="display:block;text-align:center;box-sizing:border-box;margin-top:8px" href="${c.website}" target="_blank" rel="noopener">View details →</a>
-    </div>`;
-}
-function renderEducation(tab){
-  tab = tab==='scholarships' ? 'scholarships' : 'colleges';
-  return `
-  <div class="card" style="padding:18px;background:linear-gradient(120deg,var(--brand),var(--magenta));color:#fff">
-    <h2 style="margin:0 0 4px">🎓 Education — Courses, Colleges &amp; Scholarships</h2>
-    <div style="font-size:13px;opacity:.92">${COLLEGES.length} top institutions and ${SCHOLARSHIPS.length} scholarship programmes across India.</div>
-  </div>
-  <div class="tabs" style="margin-top:14px">
-    <button class="${tab==='colleges'?'active':''}" onclick="goTo('#/education/colleges')">🏫 Colleges &amp; Universities</button>
-    <button class="${tab==='scholarships'?'active':''}" onclick="goTo('#/education/scholarships')">💰 Scholarships</button>
-  </div>
-  ${tab==='scholarships' ? renderScholarshipsSection() : renderCollegesSection()}
-  `;
-}
-function renderCollegesSection(){
-  return `
-  <div class="card" style="padding:12px;margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
-    <input id="eduSearchInput" type="text" placeholder="Search by college, university or city…" oninput="filterEducation()" style="flex:1;min-width:200px;box-sizing:border-box">
-    <select id="eduStateSelect" onchange="filterEducation()" style="min-width:160px">
-      <option value="">All States (${COLLEGES.length})</option>
-      ${EDU_STATES.map(s=>`<option value="${s}">${s} (${COLLEGES.filter(c=>c.state===s).length})</option>`).join('')}
-    </select>
-  </div>
-  <div class="tabs" id="eduTabs" style="margin-top:14px;flex-wrap:wrap">
-    <button class="active" data-stream="" onclick="filterEducation(this)">All (${COLLEGES.length})</button>
-    ${EDU_STREAMS.map(s=>`<button data-stream="${s}" onclick="filterEducation(this)">${s} (${COLLEGES.filter(c=>c.stream===s).length})</button>`).join('')}
-  </div>
-  <div id="educationTab" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));margin-top:14px">
-  ${COLLEGES.map(collegeCard).join('')}
-  </div>
-  <div class="disclaimer">College names are real institutions, but entrance-exam, hostel and fee details shown are illustrative summaries for demo purposes — always verify current cut-offs, seats and fee structure on the official website (linked via "View details") before applying.</div>
-  `;
-}
-function filterEducation(btn){
-  const tabsWrap = document.getElementById('eduTabs');
-  if(btn){
-    tabsWrap.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-  const activeBtn = tabsWrap.querySelector('button.active');
-  const stream = activeBtn ? activeBtn.dataset.stream : '';
-  const selectedState = (document.getElementById('eduStateSelect')||{}).value || '';
-  const q = (document.getElementById('eduSearchInput').value||'').trim().toLowerCase();
-  let list = stream ? COLLEGES.filter(c=>c.stream===stream) : COLLEGES;
-  if(selectedState) list = list.filter(c=>c.state===selectedState);
-  if(q) list = list.filter(c => c.name.toLowerCase().includes(q) || c.city.toLowerCase().includes(q) || c.state.toLowerCase().includes(q));
-  document.getElementById('educationTab').innerHTML = list.length ? list.map(collegeCard).join('') : `<div class="card" style="padding:20px;text-align:center;color:var(--muted)">No colleges or universities match your search.</div>`;
-}
-
-function scholarshipCard(s){
-  return `
-    <div class="card" style="padding:14px">
-      <div style="display:flex;justify-content:space-between;gap:8px"><b>${s.name}</b><span class="pill" style="flex-shrink:0">${s.type}</span></div>
-      <div style="font-size:13px;color:var(--text-secondary);margin-top:6px">${s.provider}</div>
-      <div style="font-size:12px;margin-top:8px"><b>Eligibility:</b> ${s.eligibility}</div>
-      <div style="font-size:12px"><b>How to apply:</b> ${s.howToApply}</div>
-      <a class="btn sm block" style="display:block;text-align:center;box-sizing:border-box;margin-top:8px" href="${s.website}" target="_blank" rel="noopener">Apply / Learn more →</a>
-    </div>`;
-}
-function renderScholarshipsSection(){
-  return `
-  <div class="card" style="padding:12px;margin-top:14px">
-    <input id="scholarSearchInput" type="text" placeholder="Search by scholarship name or provider…" oninput="filterScholarships()" style="width:100%;box-sizing:border-box">
-  </div>
-  <div class="tabs" id="scholarTabs" style="margin-top:14px;flex-wrap:wrap">
-    <button class="active" data-type="" onclick="filterScholarships(this)">All (${SCHOLARSHIPS.length})</button>
-    ${SCHOLARSHIP_TYPES.map(t=>`<button data-type="${t}" onclick="filterScholarships(this)">${t} (${SCHOLARSHIPS.filter(s=>s.type===t).length})</button>`).join('')}
-  </div>
-  <div id="scholarshipsTab" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));margin-top:14px">
-  ${SCHOLARSHIPS.map(scholarshipCard).join('')}
-  </div>
-  <div class="disclaimer">Scholarship names and providers shown are real programmes, but eligibility and application details are illustrative summaries for demo purposes — always verify current criteria, deadlines and required documents on the official portal (linked via "Apply / Learn more") before applying.</div>
-  `;
-}
-function filterScholarships(btn){
-  const tabsWrap = document.getElementById('scholarTabs');
-  if(btn){
-    tabsWrap.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-    btn.classList.add('active');
-  }
-  const activeBtn = tabsWrap.querySelector('button.active');
-  const type = activeBtn ? activeBtn.dataset.type : '';
-  const q = (document.getElementById('scholarSearchInput').value||'').trim().toLowerCase();
-  let list = type ? SCHOLARSHIPS.filter(s=>s.type===type) : SCHOLARSHIPS;
-  if(q) list = list.filter(s => s.name.toLowerCase().includes(q) || s.provider.toLowerCase().includes(q));
-  document.getElementById('scholarshipsTab').innerHTML = list.length ? list.map(scholarshipCard).join('') : `<div class="card" style="padding:20px;text-align:center;color:var(--muted)">No scholarships match your search.</div>`;
-}
-
 const CHAT_RESPONSES = [
   {k:['price','cost','cheap'], r:"I can compare prices across Amazon, Flipkart, Myntra, Meesho, Snapdeal & Ajio — open any product and tap 'Compare Prices'."},
   {k:['ar','try','fit'], r:"Use AI Camera to upload a photo, then tap 'View in AR' on a product page to see it in your space before buying."},
   {k:['hospital','doctor','medical'], r:"Check the Hospitals tab for free & low-cost hospitals, blood banks, and ambulance numbers near you."},
   {k:['job','resume','career'], r:"Browse Government & Private job listings in the Jobs tab, and use the built-in Resume Builder to create one instantly."},
   {k:['premium','plan','subscription'], r:"Howitlooks has Free, Starter (₹100/mo), Premium (₹250/mo), Family and Business plans — check the Premium tab for full details."},  {k:['scheme','government','yojana'], r:"The Govt Schemes tab lists welfare schemes with eligibility criteria and coverage area."},
-  {k:['college','university','education','course','admission','entrance'], r:"The Education & Colleges tab lists top colleges and universities across India with their entrance exams, hostel facility and fee structure — search by name or city, or filter by stream."},
-  {k:['scholarship','scholarships','financial aid','stipend'], r:"Tap the Scholarships tab inside Education & Colleges to see government, AICTE/UGC and private scholarship programmes — with eligibility and how to apply for each."},
 ];
 function renderChat(){
   return `
@@ -5045,7 +4802,7 @@ function renderLegal(page){
     about: ['About Howitlooks', [
       'Howitlooks turns "I like this but don\'t know where to buy it" into a photo. See a product you like — a shoe someone\'s wearing, a dress in a shop window, a chair at a friend\'s house — take a photo, and Howitlooks finds similar products you can buy online, with results pulled from Amazon, Flipkart, Myntra, Ajio, Croma and Tata CliQ to compare and buy.',
       'On top of that, AR Try-On and "View in My Room" let you preview how a product looks on you or in your space before you buy, Price Watch alerts you when a price you\'re tracking drops, and AI-personalized recommendations improve the more you use the app.',
-      'Beyond shopping, Howitlooks also helps you find affordable hospitals nearby, search for jobs by skill and location, check your eligibility for government schemes, and explore top colleges, universities and scholarships across India — with entrance exams, hostel facility, fee structure, and how to apply — all from one app.',
+      'Beyond shopping, Howitlooks also helps you find affordable hospitals nearby, search for jobs by skill and location, and check your eligibility for government schemes — all from one app.',
       '<b>How it works:</b> you see a product you like → take a photo → Howitlooks finds similar products that you can buy online.',
     ]],
     privacy: ['Privacy Policy', [
