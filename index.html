@@ -1142,6 +1142,39 @@ const COLLEGES = [
 ];
 const EDU_STREAMS = [...new Set(COLLEGES.map(c=>c.stream))].sort();
 const EDU_STATES = [...new Set(COLLEGES.map(c=>c.state))].sort();
+/* ---------------- Scholarships ----------------
+   A curated sample of real scholarship programmes — central & state
+   government, statutory bodies (AICTE/UGC/DST) and private/corporate
+   philanthropy — not an exhaustive database (thousands of scholarships
+   exist). "Apply / Learn more" links go to each provider's real official
+   portal; for the many private/corporate scholarships run through a
+   listing platform rather than each company's own site, that platform's
+   real official site is used instead of guessing a corporate CSR URL. */
+const SCHOLARSHIPS = [
+  {name:'National Scholarship Portal (NSP) — umbrella for 50+ Central & State schemes', provider:'Ministry of Education, Govt of India', type:'Central Govt', eligibility:'Varies by scheme — covers class 1 to PhD students; most require a valid Aadhaar-linked bank account and family income proof', howToApply:'Register and apply online at the National Scholarship Portal; renew every year to continue receiving it', website:'https://scholarships.gov.in'},
+  {name:'Central Sector Scheme of Scholarship for College & University Students', provider:'Ministry of Education', type:'Central Govt', eligibility:'Top 20th percentile in Class 12 boards, family income below ₹4.5 LPA, pursuing regular degree/diploma courses', howToApply:'Apply online via the National Scholarship Portal (NSP) during the annual application window', website:'https://scholarships.gov.in'},
+  {name:'Post-Matric Scholarship for SC Students', provider:'Ministry of Social Justice & Empowerment', type:'Central Govt', eligibility:'SC students studying post-Class 10, family income within prescribed limit', howToApply:'Apply online via the National Scholarship Portal (NSP)', website:'https://scholarships.gov.in'},
+  {name:'Post-Matric Scholarship for OBC Students', provider:'Ministry of Social Justice & Empowerment', type:'Central Govt', eligibility:'OBC students studying post-Class 10, family income within prescribed limit', howToApply:'Apply online via the National Scholarship Portal (NSP)', website:'https://scholarships.gov.in'},
+  {name:'Pre-Matric & Post-Matric Scholarship for Minorities', provider:'Ministry of Minority Affairs', type:'Central Govt', eligibility:'Students from notified minority communities (Muslim, Christian, Sikh, Buddhist, Parsi, Jain), family income within prescribed limit', howToApply:'Apply online via the National Scholarship Portal (NSP)', website:'https://scholarships.gov.in'},
+  {name:'National Means-cum-Merit Scholarship (NMMS)', provider:'Ministry of Education (state-implemented)', type:'Central Govt', eligibility:'Class 9 students from economically weaker sections who clear the state NMMS selection test; continues through Class 12', howToApply:'Apply through your State Education Department / school, or via NSP', website:'https://scholarships.gov.in'},
+  {name:'AICTE Pragati Scholarship for Girls', provider:'All India Council for Technical Education (AICTE)', type:'AICTE', eligibility:'Girl students (max 2 per family) in AICTE-approved diploma/degree technical colleges, family income below ₹8 LPA', howToApply:'Apply online through the AICTE Pragati/Saksham portal, linked from the AICTE website', website:'https://www.aicte-india.org'},
+  {name:'AICTE Saksham Scholarship for Differently-Abled Students', provider:'All India Council for Technical Education (AICTE)', type:'AICTE', eligibility:'Differently-abled students (40%+ disability) in AICTE-approved diploma/UG technical colleges, family income below ₹8 LPA — up to ₹50,000/year', howToApply:'Apply online through the AICTE Pragati/Saksham portal, linked from the AICTE website', website:'https://www.aicte-india.org'},
+  {name:'Bharathi Cement Fresh & Renewal Scholarship 2026', provider:'Bharathi Cement Corporation', type:'Private / Corporate', eligibility:'Class 11 to postgraduate students; award up to ₹40,000 depending on course and merit', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/bharathi-cement-fresh-and-renewal-scholarship/'},
+  {name:'Reliance Foundation Undergraduate Scholarship 2026-27', provider:'Reliance Foundation', type:'Private / Corporate', eligibility:'Students entering the 1st year of an undergraduate course, merit-cum-means based; award up to ₹2 lakhs', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/reliance-foundation-undergraduate-scholarship-2026-27/'},
+  {name:'Reliance Foundation Postgraduate Scholarship for Engineering Students 2026', provider:'Reliance Foundation', type:'Private / Corporate', eligibility:'Students pursuing a PG engineering course, merit-cum-means based; award up to ₹6 lakhs', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/reliance-foundation-scholarship-for-pg-students/'},
+  {name:'Raman Kant Munjal Scholarship 2026', provider:'Raman Kant Munjal Foundation', type:'Private / Corporate', eligibility:'Students entering the 1st year of an undergraduate course, merit-cum-means based; award up to ₹5.5 lakhs', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/raman-kant-munjal-scholarships/'},
+  {name:'Eastman PowerUp EduSkill Scholarship 2026', provider:'Eastman Chemical Company (CSR programme)', type:'Private / Corporate', eligibility:'Diploma, UG and PG students; award up to ₹20,000', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/eastman-powerup-eduskill-scholarship/'},
+  {name:'Mahindra EmpowerHer Scholarship Program 2026', provider:'K.C. Mahindra Education Trust', type:'Private / Corporate', eligibility:'Girl students only, Class 9 to postgraduate; award around ₹5,500', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/mahindra-empowerher-scholarship-program/'},
+  {name:'Malabar Charitable Trust Scholarship 2026', provider:'Malabar Charitable Trust', type:'Private / Corporate', eligibility:'Girl students only, studying in Class 11 or 12; award based on actual course fees', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/malabar-charitable-trust-scholarship/'},
+  {name:'Indiabulls Foundation Education Support Scholarship 2026', provider:'Indiabulls Foundation', type:'Private / Corporate', eligibility:'Undergraduate students from economically weaker backgrounds; award based on actual course fees', howToApply:'View eligibility and apply via the scholarship listing on CIGMA Pedia', website:'https://cigmapedia.com/scholarships/indiabulls-foundation-education-support-scholarship/'},
+  {name:'INSPIRE Scholarship for Higher Education', provider:'Department of Science & Technology (DST)', type:'Central Govt', eligibility:'Top 1% in Class 12 boards (or top rankers in national exams) pursuing B.Sc/M.Sc/Integrated M.Sc in natural or basic sciences', howToApply:'Apply online via the INSPIRE portal', website:'https://online-inspire.gov.in'},
+  {name:'Maulana Azad National Fellowship', provider:'University Grants Commission (UGC)', type:'UGC', eligibility:'Students from notified minority communities pursuing M.Phil or PhD at a recognized university', howToApply:'Apply through the UGC National Fellowship portal, linked from the UGC website', website:'https://www.ugc.gov.in'},
+  {name:'Kalpana Chawla Scholarship for Girls in Technical Education', provider:'Haryana State Government', type:'State Govt', eligibility:'Girl students domiciled in Haryana pursuing engineering/technical diploma or degree courses, family income within prescribed limit', howToApply:'Apply via the Haryana state scholarship portal / National Scholarship Portal (NSP)', website:'https://scholarships.gov.in'},
+  {name:'Vidyasaarathi — Corporate & Trust Scholarships', provider:'Multiple companies & trusts (via NSDL-backed platform)', type:'Private / Corporate', eligibility:'Varies by individual scholarship listed — spans school to postgraduate and professional courses', howToApply:'Browse live scholarships and apply directly on the Vidyasaarathi platform', website:'https://www.vidyasaarathi.co.in'},
+  {name:'Buddy4Study — Private & Corporate Scholarship Listings', provider:'Multiple companies, banks & foundations (via Buddy4Study platform)', type:'Private / Corporate', eligibility:'Varies by individual scholarship listed — spans school, undergraduate, postgraduate and professional courses', howToApply:'Search and apply directly through listings on the Buddy4Study platform', website:'https://www.buddy4study.com'},
+  {name:'Tata Trusts Scholarship Programmes', provider:'Tata Trusts', type:'Private / Corporate', eligibility:'Meritorious students from low-income families pursuing higher education, varies by individual programme', howToApply:'Check current open programmes and apply via the Tata Trusts website', website:'https://www.tatatrusts.org'},
+];
+const SCHOLARSHIP_TYPES = [...new Set(SCHOLARSHIPS.map(s=>s.type))].sort();
 const JOB_SKILLS = [...new Set(JOBS.flatMap(j=>j.skills||[]))].sort();
 const JOB_LOCATIONS = [...new Set(JOBS.map(j=>j.loc))].sort();
 const JOB_ROLES = [...new Set(JOBS.map(j=>j.title))].sort();
@@ -1358,7 +1391,7 @@ function render(){
     'hospitals': renderHospitals,
     'jobs': renderJobs,
     'schemes': renderSchemes,
-    'education': renderEducation,
+    'education': ()=>renderEducation(parts[1]),
     'chat': renderChat,
     'premium': renderPremium,
     'admin': ()=>renderAdmin(parts[1]||'dashboard'),
@@ -1973,7 +2006,8 @@ const NAV_SEARCH_REDIRECTS = [
   {keywords:['resume','cv'], label:'📝 Resume Builder', hash:'#/jobs'},
   {keywords:['job','jobs','career','careers','vacancy','vacancies'], label:'💼 Job Search', hash:'#/jobs'},
   {keywords:['scheme','schemes','government','govt'], label:'🏛️ Government Schemes', hash:'#/schemes'},
-  {keywords:['college','colleges','university','universities','education','course','courses','admission','admissions','entrance'], label:'🎓 Education — Colleges & Universities', hash:'#/education'},
+  {keywords:['college','colleges','university','universities','education','course','courses','admission','admissions','entrance'], label:'🎓 Education — Colleges & Universities', hash:'#/education/colleges'},
+  {keywords:['scholarship','scholarships','financial aid','stipend'], label:'💰 Education — Scholarships', hash:'#/education/scholarships'},
   {keywords:['price','prices','compare','comparison'], label:'💰 Price Compare Hub', hash:'#/price-compare'},
   {keywords:['plan','plans','premium','pricing','subscription','subscriptions','upgrade'], label:'👑 Plans & Pricing', hash:'#/premium'},
   {keywords:['cart','basket'], label:'🛒 Your Cart', hash:'#/cart'},
@@ -4748,12 +4782,22 @@ function collegeCard(c){
       <a class="btn sm block" style="display:block;text-align:center;box-sizing:border-box;margin-top:8px" href="${c.website}" target="_blank" rel="noopener">View details →</a>
     </div>`;
 }
-function renderEducation(){
+function renderEducation(tab){
+  tab = tab==='scholarships' ? 'scholarships' : 'colleges';
   return `
   <div class="card" style="padding:18px;background:linear-gradient(120deg,var(--brand),var(--magenta));color:#fff">
-    <h2 style="margin:0 0 4px">🎓 Education — Courses, Colleges &amp; Universities</h2>
-    <div style="font-size:13px;opacity:.92">${COLLEGES.length} top institutions across India — entrance exam, residential facility &amp; fee structure at a glance.</div>
+    <h2 style="margin:0 0 4px">🎓 Education — Courses, Colleges &amp; Scholarships</h2>
+    <div style="font-size:13px;opacity:.92">${COLLEGES.length} top institutions and ${SCHOLARSHIPS.length} scholarship programmes across India.</div>
   </div>
+  <div class="tabs" style="margin-top:14px">
+    <button class="${tab==='colleges'?'active':''}" onclick="goTo('#/education/colleges')">🏫 Colleges &amp; Universities</button>
+    <button class="${tab==='scholarships'?'active':''}" onclick="goTo('#/education/scholarships')">💰 Scholarships</button>
+  </div>
+  ${tab==='scholarships' ? renderScholarshipsSection() : renderCollegesSection()}
+  `;
+}
+function renderCollegesSection(){
+  return `
   <div class="card" style="padding:12px;margin-top:14px;display:flex;gap:10px;flex-wrap:wrap">
     <input id="eduSearchInput" type="text" placeholder="Search by college, university or city…" oninput="filterEducation()" style="flex:1;min-width:200px;box-sizing:border-box">
     <select id="eduStateSelect" onchange="filterEducation()" style="min-width:160px">
@@ -4787,6 +4831,45 @@ function filterEducation(btn){
   document.getElementById('educationTab').innerHTML = list.length ? list.map(collegeCard).join('') : `<div class="card" style="padding:20px;text-align:center;color:var(--muted)">No colleges or universities match your search.</div>`;
 }
 
+function scholarshipCard(s){
+  return `
+    <div class="card" style="padding:14px">
+      <div style="display:flex;justify-content:space-between;gap:8px"><b>${s.name}</b><span class="pill" style="flex-shrink:0">${s.type}</span></div>
+      <div style="font-size:13px;color:var(--text-secondary);margin-top:6px">${s.provider}</div>
+      <div style="font-size:12px;margin-top:8px"><b>Eligibility:</b> ${s.eligibility}</div>
+      <div style="font-size:12px"><b>How to apply:</b> ${s.howToApply}</div>
+      <a class="btn sm block" style="display:block;text-align:center;box-sizing:border-box;margin-top:8px" href="${s.website}" target="_blank" rel="noopener">Apply / Learn more →</a>
+    </div>`;
+}
+function renderScholarshipsSection(){
+  return `
+  <div class="card" style="padding:12px;margin-top:14px">
+    <input id="scholarSearchInput" type="text" placeholder="Search by scholarship name or provider…" oninput="filterScholarships()" style="width:100%;box-sizing:border-box">
+  </div>
+  <div class="tabs" id="scholarTabs" style="margin-top:14px;flex-wrap:wrap">
+    <button class="active" data-type="" onclick="filterScholarships(this)">All (${SCHOLARSHIPS.length})</button>
+    ${SCHOLARSHIP_TYPES.map(t=>`<button data-type="${t}" onclick="filterScholarships(this)">${t} (${SCHOLARSHIPS.filter(s=>s.type===t).length})</button>`).join('')}
+  </div>
+  <div id="scholarshipsTab" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));margin-top:14px">
+  ${SCHOLARSHIPS.map(scholarshipCard).join('')}
+  </div>
+  <div class="disclaimer">Scholarship names and providers shown are real programmes, but eligibility and application details are illustrative summaries for demo purposes — always verify current criteria, deadlines and required documents on the official portal (linked via "Apply / Learn more") before applying.</div>
+  `;
+}
+function filterScholarships(btn){
+  const tabsWrap = document.getElementById('scholarTabs');
+  if(btn){
+    tabsWrap.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  const activeBtn = tabsWrap.querySelector('button.active');
+  const type = activeBtn ? activeBtn.dataset.type : '';
+  const q = (document.getElementById('scholarSearchInput').value||'').trim().toLowerCase();
+  let list = type ? SCHOLARSHIPS.filter(s=>s.type===type) : SCHOLARSHIPS;
+  if(q) list = list.filter(s => s.name.toLowerCase().includes(q) || s.provider.toLowerCase().includes(q));
+  document.getElementById('scholarshipsTab').innerHTML = list.length ? list.map(scholarshipCard).join('') : `<div class="card" style="padding:20px;text-align:center;color:var(--muted)">No scholarships match your search.</div>`;
+}
+
 const CHAT_RESPONSES = [
   {k:['price','cost','cheap'], r:"I can compare prices across Amazon, Flipkart, Myntra, Meesho, Snapdeal & Ajio — open any product and tap 'Compare Prices'."},
   {k:['ar','try','fit'], r:"Use AI Camera to upload a photo, then tap 'View in AR' on a product page to see it in your space before buying."},
@@ -4794,6 +4877,7 @@ const CHAT_RESPONSES = [
   {k:['job','resume','career'], r:"Browse Government & Private job listings in the Jobs tab, and use the built-in Resume Builder to create one instantly."},
   {k:['premium','plan','subscription'], r:"Howitlooks has Free, Starter (₹100/mo), Premium (₹250/mo), Family and Business plans — check the Premium tab for full details."},  {k:['scheme','government','yojana'], r:"The Govt Schemes tab lists welfare schemes with eligibility criteria and coverage area."},
   {k:['college','university','education','course','admission','entrance'], r:"The Education & Colleges tab lists top colleges and universities across India with their entrance exams, hostel facility and fee structure — search by name or city, or filter by stream."},
+  {k:['scholarship','scholarships','financial aid','stipend'], r:"Tap the Scholarships tab inside Education & Colleges to see government, AICTE/UGC and private scholarship programmes — with eligibility and how to apply for each."},
 ];
 function renderChat(){
   return `
@@ -4904,7 +4988,7 @@ function renderLegal(page){
     about: ['About Howitlooks', [
       'Howitlooks turns "I like this but don\'t know where to buy it" into a photo. See a product you like — a shoe someone\'s wearing, a dress in a shop window, a chair at a friend\'s house — take a photo, and Howitlooks finds similar products you can buy online, with results pulled from Amazon, Flipkart, Myntra, Ajio, Croma and Tata CliQ to compare and buy.',
       'On top of that, AR Try-On and "View in My Room" let you preview how a product looks on you or in your space before you buy, Price Watch alerts you when a price you\'re tracking drops, and AI-personalized recommendations improve the more you use the app.',
-      'Beyond shopping, Howitlooks also helps you find affordable hospitals nearby, search for jobs by skill and location, check your eligibility for government schemes, and explore top colleges and universities across India — with their entrance exams, hostel facility and fee structure — all from one app.',
+      'Beyond shopping, Howitlooks also helps you find affordable hospitals nearby, search for jobs by skill and location, check your eligibility for government schemes, and explore top colleges, universities and scholarships across India — with entrance exams, hostel facility, fee structure, and how to apply — all from one app.',
       '<b>How it works:</b> you see a product you like → take a photo → Howitlooks finds similar products that you can buy online.',
     ]],
     privacy: ['Privacy Policy', [
