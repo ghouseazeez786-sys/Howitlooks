@@ -1010,6 +1010,8 @@ const HOSPITALS = [
     diseases:[{name:'Cancer Treatment',tier:'Low-cost',cost:9000},{name:'Kidney / Dialysis',tier:'Free',cost:0},{name:'Orthopedic',tier:'Free',cost:0}]},
   {name:'Sanjeevani Multi-Speciality Hospital', city:'Bengaluru', address:'Old Airport Road, Indiranagar, Bengaluru, Karnataka – 560038', type:'Paid', beds:280, phone:'080-4455 9900', bloodbank:true,
     diseases:[{name:'Cardiac Care',tier:'Paid',cost:175000},{name:'Cancer Treatment',tier:'Paid',cost:220000},{name:'Orthopedic',tier:'Paid',cost:90000}]},
+  {name:'NIMHANS (National Institute of Mental Health & Neurosciences)', city:'Bengaluru', address:'Hosur Road, Bengaluru, Karnataka – 560029', type:'Free', beds:1096, phone:'080-2699 5000', bloodbank:true,
+    diseases:[{name:'Mental Health',tier:'Free',cost:0},{name:'Neurology',tier:'Low-cost',cost:2500}]},
   {name:'Deccan Diabetes & Eye Care Centre', city:'Hyderabad', address:'Tarnaka, Secunderabad, Hyderabad, Telangana – 500017', type:'Low-cost', beds:60, phone:'040-2233 1122', bloodbank:false,
     diseases:[{name:'Diabetes',tier:'Low-cost',cost:900},{name:'Eye Care / Cataract',tier:'Low-cost',cost:4800}]},
   {name:'Mumbai Port Trust Hospital', city:'Mumbai', address:'Wadala Truck Terminal Road, Wadala, Mumbai, Maharashtra – 400037', type:'Free', beds:220, phone:'022-2345 1122', bloodbank:true,
@@ -5241,8 +5243,29 @@ function adminAnalytics(){
   ];
   return `<div class="grid kpi">${kpis.map(([l,v,c])=>statTile(l,v,null,c)).join('')}</div>`;
 }
+function adminAffiliate(){
+  const rows = [
+    ['Amazon','41,200','3,180','7.7%',fmt(186000)],
+    ['Flipkart','33,900','2,640','7.8%',fmt(149000)],
+    ['Myntra','18,450','1,320','7.2%',fmt(58000)],
+    ['Ajio','9,870','640','6.5%',fmt(27000)],
+    ['Meesho','7,110','510','7.2%',fmt(14000)],
+    ['Snapdeal','4,230','260','6.1%',fmt(8000)],
+  ];
+  const totalRevenue = fmt(186000+149000+58000+27000+14000+8000);
+  return `
+  <div class="grid kpi">
+    ${statTile('Outbound Clicks (MTD)','1,14,760','+9.8%','#2a78d6')}
+    ${statTile('Est. Affiliate Revenue', totalRevenue, '+14.2%', '#1baf7a')}
+    ${statTile('Avg. Conversion Rate','7.4%', '+0.3%', '#eda100')}
+  </div>
+  <div class="section-title"><h2>Revenue by retailer</h2></div>
+  ${tableCard(['Retailer','Clicks (MTD)','Orders (est.)','Conv. Rate','Est. Commission'], rows)}
+  <div class="disclaimer" style="margin-top:12px">Figures above are illustrative demo data — Howitlooks doesn't yet have a live affiliate network integration, so no real commission is currently being tracked.</div>
+  `;
+}
 function adminSettings(){
-  return `<div class="card" style="pad9ding:16px;max-width:480px">
+  return `<div class="card" style="padding:16px;max-width:480px">
     <div class="toggle-row"><span>Maintenance mode</span><div class="switch" onclick="this.classList.toggle('on')"><i></i></div></div>
     <div class="toggle-row"><span>New signups enabled</span><div class="switch on" onclick="this.classList.toggle('on')"><i></i></div></div>
     <div class="toggle-row"><span>Feature flag: AR 3D room placement</span><div class="switch on" onclick="this.classList.toggle('on')"><i></i></div></div>
