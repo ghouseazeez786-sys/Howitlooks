@@ -35,6 +35,15 @@
   .disclaimer{font-size:12px;color:var(--muted);background:var(--surface-2);border:1px dashed var(--border);border-radius:10px;padding:10px 12px;margin-top:10px;}
   .hidden{display:none !important;}
 
+  /* ---- Install banner ---- */
+  #installBanner{display:none;align-items:center;gap:10px;padding:9px 16px;background:var(--surface-2);border-bottom:1px solid var(--border);font-size:13px;position:sticky;top:0;z-index:51;}
+  #installBanner.show{display:flex;}
+  #installBanner .ib-icon{flex:none;font-size:18px;}
+  #installBanner .ib-text{flex:1;min-width:0;color:var(--text-secondary);}
+  #installBanner .ib-text b{color:var(--text-primary);}
+  #installBanner button.ib-install{background:var(--brand);color:#fff;border:none;border-radius:8px;padding:6px 12px;font-weight:700;font-size:12.5px;white-space:nowrap;flex:none;}
+  #installBanner button.ib-close{background:none;border:none;font-size:16px;cursor:pointer;color:var(--muted);padding:2px 6px;flex:none;line-height:1;}
+
   /* ---- Top bar ---- */
   #topbar{position:sticky;top:0;z-index:50;display:flex;align-items:center;gap:12px;padding:10px 16px;background:linear-gradient(90deg,var(--brand),var(--brand-dark));color:#fff;box-shadow:var(--shadow);}
   #topbar .logo{font-weight:800;font-size:20px;display:flex;align-items:center;gap:6px;white-space:nowrap;flex:none;}
@@ -354,6 +363,12 @@
 </style>
 </head>
 <body>
+<div id="installBanner">
+  <span class="ib-icon">📲</span>
+  <span class="ib-text" id="installBannerText"><b>Install Howitlooks</b> — add it to your home screen, no app store needed.</span>
+  <button type="button" class="ib-install" id="installBannerBtn" onclick="promptPwaInstall()">Install</button>
+  <button type="button" class="ib-close" title="Dismiss" onclick="dismissInstallBanner()">✕</button>
+</div>
 <div id="topbar">
   <button class="icon-btn hidden" id="backBtn" title="Back to Home" onclick="goBack()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button>
   <div class="logo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg> Howitlooks</div>
@@ -1389,12 +1404,57 @@ let deferredInstallPrompt = null;
 window.addEventListener('beforeinstallprompt', e=>{
   e.preventDefault();
   deferredInstallPrompt = e;
+  showInstallBanner('android');
 });
 function promptPwaInstall(){
   if(!deferredInstallPrompt){ flashToast('This browser doesn\'t support installing yet, or the app is already installed.'); return; }
   deferredInstallPrompt.prompt();
-  deferredInstallPrompt.userChoice.finally(()=>{ deferredInstallPrompt = null; });
+  deferredInstallPrompt.userChoice.finally(()=>{ deferredInstallPrompt = null; hideInstallBanner(); });
 }
+window.addEventListener('appinstalled', hideInstallBanner);
+
+/* ---- Install banner ----
+   Shows a dismissible "Install Howitlooks" strip at the top of the app so
+   people don't have to know Add to Home Screen exists. Android/Chrome gets
+   a real one-tap Install button (via beforeinstallprompt above); iOS Safari
+   never fires that event, so it gets static Share -> Add to Home Screen
+   instructions instead. Stays hidden once already installed (standalone
+   mode) or once the person dismisses it (remembered per-browser). */
+function isPwaInstalled(){
+  return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+}
+function isIos(){
+  return /iphone|ipad|ipod/i.test(navigator.userAgent) && !window.MSStream;
+}
+function installBannerDismissed(){
+  try{ return localStorage.getItem('hil_install_banner_dismissed')==='1'; }catch(e){ return false; }
+}
+function dismissInstallBanner(){
+  try{ localStorage.setItem('hil_install_banner_dismissed', '1'); }catch(e){}
+  hideInstallBanner();
+}
+function hideInstallBanner(){
+  const el = document.getElementById('installBanner');
+  if(el) el.classList.remove('show');
+}
+function showInstallBanner(platform){
+  if(isPwaInstalled() || installBannerDismissed()) return;
+  const el = document.getElementById('installBanner');
+  const textEl = document.getElementById('installBannerText');
+  const btnEl = document.getElementById('installBannerBtn');
+  if(!el || !textEl || !btnEl) return;
+  if(platform==='ios'){
+    textEl.innerHTML = '<b>Install Howitlooks</b> — tap Share <span style="font-size:15px">⬆️</span> then "Add to Home Screen".';
+    btnEl.classList.add('hidden');
+  } else {
+    textEl.innerHTML = '<b>Install Howitlooks</b> — add it to your home screen, no app store needed.';
+    btnEl.classList.remove('hidden');
+  }
+  el.classList.add('show');
+}
+window.addEventListener('DOMContentLoaded', ()=>{
+  if(isIos() && !isPwaInstalled() && !installBannerDismissed()) showInstallBanner('ios');
+});
 
 function navItemHtml(n){
   // Nav entries with a `url` genuinely leave the app (e.g. Categories -> Amazon),
@@ -3156,11 +3216,34 @@ function applyAR(){
   const img = document.getElementById('arImg');
   if(img) img.style.transform = `rotateY(${arState.rot}deg) scale(${arState.scale/100})`;
 }
+/* Canvas export (toDataURL) throws if the source image was drawn from a
+   different origin without that origin granting CORS permission — this
+   "taints" the canvas. The real product photos now come from an external
+   CDN (Pexels) instead of same-origin data: URIs, so snapshot capture
+   loads a fresh CORS-anonymous copy of the image first; if that CDN
+   doesn't grant CORS, it falls back to the generated icon art (a data:
+   URI, which is always canvas-safe) so Capture Snapshot still works
+   either way instead of failing outright. */
+function loadCanvasSafeImage(srcEl, onReady){
+  const fallbackSrc = srcEl.getAttribute('data-fb');
+  const primary = new Image();
+  primary.crossOrigin = 'anonymous';
+  primary.onload = ()=> onReady(primary);
+  primary.onerror = ()=>{
+    if(!fallbackSrc){ onReady(null); return; }
+    const fb = new Image();
+    fb.onload = ()=> onReady(fb);
+    fb.onerror = ()=> onReady(null);
+    fb.src = fallbackSrc;
+  };
+  primary.src = srcEl.src;
+}
 function captureARSnapshot(productName){
   const img = document.getElementById('arImg');
   if(!img){ flashToast('Could not capture — try again'); return; }
 
-  const draw = ()=>{
+  const draw = (srcImg)=>{
+    if(!srcImg){ flashToast('Could not capture snapshot in this browser'); return; }
     const W = 900, H = 620;
     const canvas = document.createElement('canvas');
     canvas.width = W; canvas.height = H;
@@ -3184,7 +3267,7 @@ function captureARSnapshot(productName){
     const scale = arState.scale/100;
     const rotRad = arState.rot * Math.PI/180;
     const squashX = Math.cos(rotRad);
-    const iw = img.naturalWidth || 300, ih = img.naturalHeight || 300;
+    const iw = srcImg.naturalWidth || 300, ih = srcImg.naturalHeight || 300;
     const maxW = W*0.5, maxH = H*0.7;
     const fit = Math.min(maxW/iw, maxH/ih);
     const drawW = iw*fit*scale, drawH = ih*fit*scale;
@@ -3195,7 +3278,7 @@ function captureARSnapshot(productName){
     ctx.shadowColor = 'rgba(0,0,0,0.35)';
     ctx.shadowBlur = 30;
     ctx.shadowOffsetY = 18;
-    try{ ctx.drawImage(img, -drawW/2, -drawH/2, drawW, drawH); }catch(e){}
+    try{ ctx.drawImage(srcImg, -drawW/2, -drawH/2, drawW, drawH); }catch(e){}
     ctx.restore();
 
     // Watermark.
@@ -3221,8 +3304,7 @@ function captureARSnapshot(productName){
     flashToast('📸 Snapshot captured ✓');
   };
 
-  if(img.complete && img.naturalWidth){ draw(); }
-  else { img.addEventListener('load', draw, {once:true}); }
+  loadCanvasSafeImage(img, draw);
 }
 function closeARSnapshot(){
   const modal = document.getElementById('arSnapshotModal');
@@ -3403,31 +3485,37 @@ document.addEventListener('pointerup', ()=>{ roomDragState = null; });
 document.addEventListener('pointercancel', ()=>{ roomDragState = null; });
 function captureRoomSnapshot(productName){
   const stage = document.getElementById('roomStage');
-  const productImg = document.getElementById('roomProductImg');
-  if(!stage || !productImg){ flashToast('Could not capture — try again'); return; }
+  const productImgEl = document.getElementById('roomProductImg');
+  if(!stage || !productImgEl){ flashToast('Could not capture — try again'); return; }
 
-  if(state.roomMode==='camera'){
-    const video = document.getElementById('roomCameraVideo');
-    if(!video || !video.videoWidth){ flashToast('Camera not ready yet — try again in a moment'); return; }
-    const W = video.videoWidth, H = video.videoHeight;
-    const canvas = document.createElement('canvas');
-    canvas.width = W; canvas.height = H;
-    const ctx = canvas.getContext('2d');
-    try{ ctx.drawImage(video, 0, 0, W, H); }catch(e){}
-    finishRoomSnapshot(ctx, canvas, W, H, productImg, productName);
-    return;
-  }
+  // See loadCanvasSafeImage() above — the product photo may come from an
+  // external CDN, so get a canvas-safe copy before drawing it.
+  loadCanvasSafeImage(productImgEl, (productImg)=>{
+    if(!productImg){ flashToast('Could not capture snapshot in this browser'); return; }
 
-  const roomImg = new Image();
-  roomImg.onload = ()=>{
-    const W = roomImg.naturalWidth || 900, H = roomImg.naturalHeight || 620;
-    const canvas = document.createElement('canvas');
-    canvas.width = W; canvas.height = H;
-    const ctx = canvas.getContext('2d');
-    try{ ctx.drawImage(roomImg, 0, 0, W, H); }catch(e){}
-    finishRoomSnapshot(ctx, canvas, W, H, productImg, productName);
-  };
-  roomImg.src = state.roomPhoto;
+    if(state.roomMode==='camera'){
+      const video = document.getElementById('roomCameraVideo');
+      if(!video || !video.videoWidth){ flashToast('Camera not ready yet — try again in a moment'); return; }
+      const W = video.videoWidth, H = video.videoHeight;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      try{ ctx.drawImage(video, 0, 0, W, H); }catch(e){}
+      finishRoomSnapshot(ctx, canvas, W, H, productImg, productName);
+      return;
+    }
+
+    const roomImg = new Image();
+    roomImg.onload = ()=>{
+      const W = roomImg.naturalWidth || 900, H = roomImg.naturalHeight || 620;
+      const canvas = document.createElement('canvas');
+      canvas.width = W; canvas.height = H;
+      const ctx = canvas.getContext('2d');
+      try{ ctx.drawImage(roomImg, 0, 0, W, H); }catch(e){}
+      finishRoomSnapshot(ctx, canvas, W, H, productImg, productName);
+    };
+    roomImg.src = state.roomPhoto;
+  });
 }
 function finishRoomSnapshot(ctx, canvas, W, H, productImg, productName){
   const p = state.roomPlacement;
