@@ -925,6 +925,16 @@ function snapdealLink(query){
 function ajioLink(query){
   return `https://www.ajio.com/search/?text=${encodeURIComponent(query)}`;
 }
+/* Real, commission-earning Ajio links via GrabCash (ajiio.cc short links),
+   generated one product at a time in GrabCash's dashboard — Ajio/GrabCash
+   doesn't offer a single reusable tracking code the way Amazon does, so this
+   only covers products that have actually been generated so far. Keyed by
+   Howitlooks product id. Every other product keeps using the generic (real,
+   working, just untracked/non-earning) ajioLink() search above until more
+   get added here. */
+const AJIO_TRACKED_LINKS = {
+  p14: 'https://ajiio.cc/9rsdtvs', // Men's Leather Biker Jacket -> Ajio "Jackets & Coats"
+};
 // Government Schemes' "View details" used to just flash a fake "Opening…"
 // toast and do nothing — a dead-end exactly like the old Checkout button.
 // There's no real per-scheme detail page in this demo, so instead of
@@ -2278,6 +2288,9 @@ function renderSearch(q){
 // build a search URL for (Amazon, Flipkart, Myntra, Meesho, Snapdeal,
 // Ajio), falling back to Amazon so this always resolves to something.
 function storeLinkFor(p){
+  // A real, tracked affiliate link always wins over a generic untracked
+  // search link, even if it isn't this product's "first" category partner.
+  if(AJIO_TRACKED_LINKS[p.id]) return AJIO_TRACKED_LINKS[p.id];
   const brands = BRANDS_BY_CATEGORY[p.cat] || [];
   for(const b of brands){
     // Category lists spell Amazon several ways ("Amazon.in", "Amazon
@@ -3771,7 +3784,9 @@ function renderPrice(id){
           <td><b>${fmt(r.price)}</b></td>
           <td>${r.delivery}</td>
           <td>${r.eta}</td>
-          <td>${PARTNER_LINK_BUILDERS[r.partner]
+          <td>${r.partner==='Ajio' && AJIO_TRACKED_LINKS[p.id]
+            ? `<a class="btn sm" style="background:${r.color};display:inline-block" href="${AJIO_TRACKED_LINKS[p.id]}" target="_blank" rel="noopener sponsored">Buy →</a>`
+            : PARTNER_LINK_BUILDERS[r.partner]
             ? `<a class="btn sm" style="background:${r.color};display:inline-block" href="${PARTNER_LINK_BUILDERS[r.partner](p.name)}" target="_blank" rel="noopener sponsored">Buy →</a>`
             : `<button class="btn sm" style="background:${r.color}" onclick="flashToast('Redirecting to ${r.partner}...')">Buy →</button>`}</td>
         </tr>
