@@ -904,23 +904,41 @@ function amazonLink(query){
   const base = `https://www.${AMAZON_DOMAIN}/s?k=${encodeURIComponent(query)}`;
   return AMAZON_TAG ? `${base}&tag=${encodeURIComponent(AMAZON_TAG)}` : base;
 }
-/* Flipkart and Myntra affiliate programs work the same way as Amazon's —
-   once approved, an affiliate ID gets appended to these URLs too. Both are
-   left blank for the same reason as AMAZON_TAG above. */
-const FLIPKART_TAG = '';
-const MYNTRA_TAG = '';
+/* Flipkart and Myntra are both monetized through INRDeals (inr.deals
+   redirect links) instead of a store-specific tag — INRDeals assigns one
+   fixed publisher ID that works the same way across every product on
+   either store, confirmed by generating two different Myntra links and
+   seeing the same id= value both times. Flipkart's INRDeals campaign is
+   paused as of when this was wired in (confirmed via a "Campaign is
+   paused" message when testing), so Flipkart links won't earn commission
+   until that campaign goes live again on INRDeals' side — but the link
+   itself still works as a normal Flipkart search, and will start earning
+   automatically the moment it's unpaused, with no further changes needed
+   here. */
+const INRDEALS_ID = 'gho479269418';
+function inrDealsLink(destinationUrl){
+  return `https://inr.deals/track?id=${encodeURIComponent(INRDEALS_ID)}&src=backend&url=${encodeURIComponent(destinationUrl)}`;
+}
 function flipkartLink(query){
-  const base = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
-  return FLIPKART_TAG ? `${base}&affid=${encodeURIComponent(FLIPKART_TAG)}` : base;
+  const dest = `https://www.flipkart.com/search?q=${encodeURIComponent(query)}`;
+  return inrDealsLink(dest);
 }
 function myntraLink(query){
-  return `https://www.myntra.com/${encodeURIComponent(query.replace(/\s+/g,'-'))}`;
+  const dest = `https://www.myntra.com/${encodeURIComponent(query.replace(/\s+/g,'-'))}`;
+  return inrDealsLink(dest);
 }
 function meeshoLink(query){
-  return `https://www.meesho.com/search?q=${encodeURIComponent(query)}`;
+  // Same INRDeals reusable tracking ID as Flipkart/Myntra — confirmed
+  // working (not paused) by generating two different Meesho product links
+  // and seeing the same id= value both times.
+  const dest = `https://www.meesho.com/search?q=${encodeURIComponent(query)}`;
+  return inrDealsLink(dest);
 }
 function snapdealLink(query){
-  return `https://www.snapdeal.com/search?keyword=${encodeURIComponent(query)}`;
+  // Same INRDeals reusable tracking ID as Flipkart/Myntra/Meesho — confirmed
+  // working (not paused) via two different generated Snapdeal product links.
+  const dest = `https://www.snapdeal.com/search?keyword=${encodeURIComponent(query)}`;
+  return inrDealsLink(dest);
 }
 function ajioLink(query){
   return `https://www.ajio.com/search/?text=${encodeURIComponent(query)}`;
