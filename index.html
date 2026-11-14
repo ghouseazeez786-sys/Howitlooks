@@ -478,6 +478,10 @@
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js"></script>
 <script src="firebase-config.js"></script>
+<!-- Auto-refreshed Electronics & Appliances listings (see .github/workflows/update-catalog.yml).
+     Defines AUTO_PRODUCTS when live data exists; harmless if this file is
+     missing or still empty — the main script below handles that case. -->
+<script src="auto-products.js"></script>
 
 <script>
 const DEMO_VIDEO_EN_DATA_URI = "howitlooks-demo-en.mp4";
@@ -743,7 +747,12 @@ const BRANDS_BY_CATEGORY = {
   ],
 };
 const PALETTE_BG = ['#2a78d6','#eb6834','#1baf7a','#eda100','#e87ba4','#4a3aa7','#e34948','#008300'];
-const PRODUCTS = [
+/* BASE_PRODUCTS is the hand-curated catalog — never touched by automation.
+   Live Electronics & Appliances listings (once Amazon PA-API / Flipkart
+   Affiliate API access is unlocked) are refreshed separately into
+   auto-products.js by .github/workflows/update-catalog.yml, and merged in
+   below as PRODUCTS without ever modifying this list. */
+const BASE_PRODUCTS = [
   {id:'p1', name:'Aria X12 Smartphone (128GB)', cat:'mobiles', price:18999, mrp:23999},
   {id:'p2', name:'PulseFit Noise-Cancel Headphones', cat:'electronics', price:3499, mrp:4999},
   {id:'p3', name:"Men's Classic Oxford Shirt", cat:'men', price:1299, mrp:1899},
@@ -839,6 +848,11 @@ const PRODUCTS = [
   {id:'p93', name:'Kids Sipper Water Bottle with Straw (600ml)', cat:'toys', price:249, mrp:399},
   {id:'p94', name:'Sports Sipper Bottle with Shaker Ball (700ml)', cat:'sports', price:279, mrp:449},
 ];
+/* Live-fetched items (if any) merge in here. auto-products.js defines
+   AUTO_PRODUCTS when it has data; if the file is missing, empty, or fails to
+   load for any reason, this safely falls back to an empty list and the site
+   runs on BASE_PRODUCTS alone — exactly like before this feature existed. */
+const PRODUCTS = [...BASE_PRODUCTS, ...(typeof AUTO_PRODUCTS!=='undefined' && Array.isArray(AUTO_PRODUCTS) ? AUTO_PRODUCTS : [])];
 PRODUCTS.forEach((p,i)=>{ p.imgFallback = productArt(p, PALETTE_BG[i%PALETTE_BG.length]); p.img = productPhoto(p) || p.imgFallback; p.rating=(3.7+ (i%5)*0.25).toFixed(1); });
 
 /* ---- Daily-refreshing deals engine ----
@@ -2891,7 +2905,8 @@ function renderAICamera(){
     </div>
     <label style="text-align:left;margin-top:0;display:flex;align-items:center;gap:7px"><span style="display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:#e74c3c;color:#fff;font-size:11px;font-weight:800;flex:none">1</span>Describe it in a few words</label>
     <div style="font-size:12.5px;color:var(--text-secondary);background:var(--surface-2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin:2px 0 8px"><b>✏️ Whatever photo you are about to take or upload below, please type or tap the microphone and say what it is — for example: Shoes, Dress/Clothing, Bag, Watch, Furniture, Electronics, Fridge, AC, Mobile, Jewellery, Table, Chair, etc. — so we can show you matching similar products.</b></div>
-    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px"><span style="display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:#2980b9;color:#fff;font-size:11px;font-weight:800;flex:none">2</span><span style="font-size:12px;font-weight:700;color:#2980b9">Type here, or tap 🎤 to speak</span></div>
+    <div style="display:flex;align-items:center;justify-content:center;gap:6px;margin-bottom:6px;flex-wrap:wrap"><span style="display:inline-flex;align-items:center;justify-content:center;width:19px;height:19px;border-radius:50%;background:#2980b9;color:#fff;font-size:11px;font-weight:800;flex:none">2</span><span style="font-size:12px;font-weight:700;color:#2980b9">Type here, or tap 🎤 to speak</span><span style="font-size:10px;font-weight:800;color:#fff;background:#e74c3c;border-radius:5px;padding:2px 6px">Required</span></div>
+    <div style="text-align:center;font-size:11px;color:var(--text-secondary);margin:-2px 0 6px">Whatever you type here (Dress, Shoes, Fridge, etc.) is what unlocks "Take a Photo" / "Choose File" below</div>
     <div style="display:flex;gap:8px;align-items:stretch">
       <input type="text" id="productDescInput" value="${(state.uploadedDescription||'').replace(/"/g,'&quot;')}" oninput="state.uploadedDescription=this.value; updateUploadUnlock(); if(state.uploadedImage && typeof renderResultTabs==='function') renderResultTabs();" placeholder="e.g. Shoes, Fridge, Electronics, Furniture, Nike Shoes" style="flex:1;min-width:0;box-sizing:border-box;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--text-primary);font-size:14px;font-family:inherit">
       <button type="button" id="micBtn" onclick="startVoiceInput()" title="Tap and speak instead of typing" style="flex:none;width:46px;border-radius:10px;border:1px solid var(--border);background:var(--surface);color:var(--brand);font-size:18px;cursor:pointer">🎤</button>
