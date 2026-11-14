@@ -2050,7 +2050,7 @@ function renderHome(){
 
   <div class="section-title"><h2>✨ Everything Howitlooks can do for you</h2></div>
   <div class="grid features">${FEATURE_HIGHLIGHTS.map(f=>`
-    <button type="button" class="feature-tile" onclick="location.hash='${f.route}'">
+    <button type="button" class="feature-tile" ${f.label==='See How It Appears' ? 'style="border:2px solid #e74c3c;box-shadow:0 0 0 3px rgba(231,76,60,.15)"' : ''} onclick="location.hash='${f.route}'">
       <div class="ic" style="background:${f.color}">${icon(f.icon)}</div>
       <div><div class="lbl">${f.label}</div><div class="desc">${f.desc}</div></div>
     </button>`).join('')}
