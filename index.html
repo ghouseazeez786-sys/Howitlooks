@@ -486,6 +486,8 @@
 <script>
 const DEMO_VIDEO_EN_DATA_URI = "howitlooks-demo-en.mp4";
 const DEMO_VIDEO_DATA_URI = "howitlooks-demo-hi.mp4";
+const DEMO_VIDEO_KN_DATA_URI = "howitlooks-demo-kn.mp4";
+const DEMO_VIDEO_TE_DATA_URI = "howitlooks-demo-te.mp4";
 
 /* =========================================================
    Howitlooks — client-side demo prototype
@@ -1359,6 +1361,8 @@ function toggleTheme(){
 }
 function demoVideoSrcFor(lang){
   if(lang==='hi') return DEMO_VIDEO_DATA_URI;
+  if(lang==='kn') return DEMO_VIDEO_KN_DATA_URI;
+  if(lang==='te') return DEMO_VIDEO_TE_DATA_URI;
   return DEMO_VIDEO_EN_DATA_URI;
 }
 function setLoginDemoLang(lang){
@@ -1601,6 +1605,8 @@ function renderLogin(){
             <div class="auth-lang-toggle">
               <button type="button" class="auth-lang-btn${state.loginDemoLang==='en'?' active':''}" data-lang="en" onclick="setLoginDemoLang('en')">English</button>
               <button type="button" class="auth-lang-btn${state.loginDemoLang==='hi'?' active':''}" data-lang="hi" onclick="setLoginDemoLang('hi')">हिंदी</button>
+              <button type="button" class="auth-lang-btn${state.loginDemoLang==='kn'?' active':''}" data-lang="kn" onclick="setLoginDemoLang('kn')">ಕನ್ನಡ</button>
+              <button type="button" class="auth-lang-btn${state.loginDemoLang==='te'?' active':''}" data-lang="te" onclick="setLoginDemoLang('te')">తెలుగు</button>
             </div>
           </div>
         </div>
