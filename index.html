@@ -78,6 +78,9 @@
   footer .links{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:10px;}
   footer .links button{background:none;border:none;font-family:inherit;font-size:inherit;padding:0;color:inherit;cursor:pointer;}
   footer .links button:hover{color:var(--brand);}
+  .auth-footer-links{width:100%;display:flex;gap:16px;flex-wrap:wrap;justify-content:center;padding:18px 16px 8px;font-size:12.5px;}
+  .auth-footer-links button{background:none;border:none;font-family:inherit;font-size:inherit;padding:0;color:rgba(255,255,255,.85);cursor:pointer;text-decoration:underline;}
+  .auth-footer-links button:hover{color:#fff;}
 
   /* No hamburger/off-canvas drawer: below 860px, the sidebar simply hides and
      the bottom nav (already built) becomes the sole mobile navigation,
@@ -192,7 +195,7 @@
   body.auth-mode #topbar,body.auth-mode #sidenav,body.auth-mode #bottomnav,body.auth-mode footer{display:none !important;}
   body.auth-mode #shell{display:block;min-height:0;}
   body.auth-mode #main{padding:0;}
-  .auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:32px 16px;box-sizing:border-box;}
+  .auth-page{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 16px;box-sizing:border-box;}
   .auth-page-inner{display:flex;gap:40px;align-items:center;max-width:1080px;width:100%;flex-wrap:wrap;justify-content:center;}
   .auth-showcase{flex:1 1 460px;max-width:520px;color:#fff;}
   .auth-showcase .brand-line{display:flex;align-items:center;gap:9px;font-size:27px;font-weight:800;margin-bottom:10px;}
@@ -855,13 +858,16 @@ const BASE_PRODUCTS = [
    load for any reason, this safely falls back to an empty list and the site
    runs on BASE_PRODUCTS alone — exactly like before this feature existed. */
 const PRODUCTS = [...BASE_PRODUCTS, ...(typeof AUTO_PRODUCTS!=='undefined' && Array.isArray(AUTO_PRODUCTS) ? AUTO_PRODUCTS : [])];
-PRODUCTS.forEach((p,i)=>{ p.imgFallback = productArt(p, PALETTE_BG[i%PALETTE_BG.length]); p.img = productPhoto(p) || p.imgFallback; p.rating=(3.7+ (i%5)*0.25).toFixed(1); });
+PRODUCTS.forEach((p,i)=>{ p.imgFallback = productArt(p, PALETTE_BG[i%PALETTE_BG.length]); p.img = productPhoto(p) || p.imgFallback; });
 
-/* ---- Daily-refreshing deals engine ----
-   No live backend exists in this prototype, so "auto-updates daily" is simulated:
-   every price/discount below is derived from today's calendar date via a seeded
-   pseudo-random function. Everyone sees the same numbers on the same day, and the
-   numbers change again automatically the next day — with no server needed. */
+/* ---- Daily "featured picks" rotation ----
+   No live backend exists in this prototype and Howitlooks doesn't receive
+   real price/discount/rating data from Amazon or Flipkart, so this app
+   never invents or displays prices, discounts, star ratings or coupon
+   codes anywhere — those aren't ours to claim. This seeded shuffle just
+   picks a different, stable subset of real-named product categories to
+   feature each day (everyone sees the same picks on the same day), purely
+   for variety — no numbers are attached to it. */
 function mulberry32(seed){
   return function(){
     seed |= 0; seed = (seed + 0x6D2B79F5) | 0;
@@ -880,27 +886,11 @@ function todayDateKey(){
   return `${d.getFullYear()}-${d.getMonth()+1}-${d.getDate()}`;
 }
 const DAILY_KEY = todayDateKey();
-// Deterministic "ready to opt" coupon code for any string (product id, or a
-// category+store combo for the AI Camera "similar products" section) — same
-// seeded-random pattern as the daily discounts above, so codes are stable
-// for everyone all day, then change again automatically tomorrow.
-function couponCodeFor(seedStr){
-  const rnd = mulberry32(stringSeed(DAILY_KEY + '|COUPON|' + seedStr));
-  const letters = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // no confusing 0/O/1/I
-  let code = '';
-  for(let i=0;i<6;i++) code += letters[Math.floor(rnd()*letters.length)];
-  return 'HOWIT' + code;
-}
-PRODUCTS.forEach(p=>{
-  const rnd = mulberry32(stringSeed(DAILY_KEY + '|' + p.id));
-  const discountPct = 12 + Math.floor(rnd()*29); // 12%–40%, changes daily per product
-  p.discountPct = discountPct;
-  p.price = Math.max(1, Math.round(p.mrp * (1 - discountPct/100) / 10) * 10 - 1);
-  p.couponCode = couponCodeFor(p.id);
-  p.couponExtraPct = 5 + Math.floor(rnd()*10); // extra 5%-14% off with the code, changes daily
-});
-const TODAYS_DEALS = [...PRODUCTS].sort((a,b)=>b.discountPct-a.discountPct).slice(0,8);
-const MAX_DEAL_DISCOUNT = TODAYS_DEALS.length ? TODAYS_DEALS[0].discountPct : 30;
+const TODAYS_DEALS = [...PRODUCTS].sort((a,b)=>{
+  const ra = mulberry32(stringSeed(DAILY_KEY+'|'+a.id))();
+  const rb = mulberry32(stringSeed(DAILY_KEY+'|'+b.id))();
+  return ra-rb;
+}).slice(0,8);
 
 /* ---- Amazon Associates affiliate config ----
    Left blank on purpose: affiliate programs (Amazon Associates, Flipkart
@@ -994,12 +984,6 @@ const AFFILIATES = [
   {name:'Amazon', color:'#eb6834'}, {name:'Flipkart', color:'#2a78d6'}, {name:'Myntra', color:'#e34948'},
   {name:'Meesho', color:'#4a3aa7'}, {name:'Snapdeal', color:'#e87ba4'}, {name:'Ajio', color:'#1baf7a'},
 ];
-function priceRows(base){
-  return AFFILIATES.map((a,i)=>{
-    const jitter = Math.round(base * (0.9 + ((i*37)%20)/100));
-    return {partner:a.name, color:a.color, price:jitter, delivery: (i%3===0)?'Free delivery':`₹${(i*19)%80+29} delivery`, eta: `${2+(i%5)} days`};
-  }).sort((a,b)=>a.price-b.price);
-}
 
 /* Each hospital lists the diseases/conditions it treats along with an
    approximate cost tier, so the "which hospital is cheapest for my
@@ -1346,12 +1330,11 @@ const state = {
   // "AI-personalized recommendations" home-page section. In-memory only,
   // same as cart, since this prototype has no account-level backend.
   viewedProducts:[],
-  // Price-drop alerts (Premium feature) — persisted to localStorage so
-  // watched items and past alerts survive a reload/reopen, since the whole
-  // point is being notified later, not just in the current session.
-  priceWatchlist:[],   // [{id, watchedPrice, addedAt}]
-  priceAlerts:[],      // [{id, name, oldPrice, newPrice, at}]
-  priceOverrides:{},   // {productId: simulatedCurrentPrice} — demo-only, see renderPriceWatch()
+  // Price Watch bookmark list (Premium feature) — persisted to localStorage
+  // so saved items survive a reload/reopen. Howitlooks has no live retailer
+  // price feed, so this is a plain bookmark list, not a real price-drop
+  // alert — no price numbers are generated or stored here.
+  priceWatchlist:[],   // [{id, addedAt}]
 };
 
 
@@ -1512,10 +1495,15 @@ function navItemHtml(n){
   return `<button type="button" data-route="${n.id}" onclick="goTo('#/${n.id}')">${icon(n.icon)}<span>${n.label}</span></button>`;
 }
 function buildNav(){
+  // The Admin Panel is an internal/ops view, not something a visitor —
+  // logged in or not — should see or be tempted to tap into, so it's left
+  // out of the nav entirely unless someone is signed in with a real
+  // (non-Guest) account.
+  const visible = NAV.filter(n => n.id!=='admin' || (state.user && state.user.name!=='Guest'));
   const side = document.getElementById('sidenav');
   const bottom = document.getElementById('bottomnav');
-  side.innerHTML = NAV.map(navItemHtml).join('');
-  bottom.innerHTML = NAV.map(navItemHtml).join(''); // all items — bottom nav scrolls horizontally on mobile
+  side.innerHTML = visible.map(navItemHtml).join('');
+  bottom.innerHTML = visible.map(navItemHtml).join(''); // all items — bottom nav scrolls horizontally on mobile
 }
 function setActiveNav(routeId){
   document.querySelectorAll('#sidenav [data-route], #bottomnav [data-route]').forEach(a=>{
@@ -1536,6 +1524,7 @@ function render(){
   if(root !== 'room-ar' && typeof stopRoomCamera === 'function') stopRoomCamera();
   if(root !== 'price-watch' && typeof stopPriceWatchInterval === 'function') stopPriceWatchInterval();
   const main = document.getElementById('main');
+  buildNav();
   setActiveNav(root);
   updateCartCount();
 
@@ -1544,7 +1533,7 @@ function render(){
   const backBtn = document.getElementById('backBtn');
   if(backBtn) backBtn.classList.toggle('hidden', needsLogin);
 
-  if(needsLogin && root!=='login'){
+  if(needsLogin && root!=='login' && root!=='legal'){
     main.innerHTML = renderLogin();
     return;
   }
@@ -1632,6 +1621,12 @@ function renderLogin(){
           <div id="otpRecaptchaContainer"></div>
         </div>
       </div>
+    </div>
+    <div class="auth-footer-links">
+      <button type="button" onclick="goTo('#/legal/about')">About</button>
+      <button type="button" onclick="goTo('#/legal/privacy')">Privacy Policy</button>
+      <button type="button" onclick="goTo('#/legal/terms')">Terms of Service</button>
+      <button type="button" onclick="goTo('#/legal/contact')">Contact Us</button>
     </div>
   </div>`;
 }
@@ -2051,7 +2046,7 @@ const FEATURE_HIGHLIGHTS = [
   {label:'Govt Schemes', desc:'Check your eligibility', icon:'doc', color:'#4a3aa7', route:'#/schemes'},
   {label:'Education & Colleges', desc:'Courses, entrance exams & fees', icon:'grad', color:'#1b8fa0', route:'#/education'},
   {label:'AI Chat Assistant', desc:'Ask about anything', icon:'chat', color:'#e87ba4', route:'#/chat'},
-  {label:'Price Watch', desc:'Get alerted on price drops', icon:'bell', color:'#d64545', route:'#/price-watch'},
+  {label:'Price Watch', desc:'Bookmark items to check later', icon:'bell', color:'#d64545', route:'#/price-watch'},
   {label:'Go Premium', desc:'Unlimited AI + AR', icon:'crown', color:'#008300', route:'#/premium'},
 ];
 function renderHome(){
@@ -2079,8 +2074,8 @@ function renderHome(){
   <div class="section-title"><h2>Shop by Category</h2><button type="button" class="pill pill-btn" onclick="goTo('#/compare-stores')">Compare famous stores</button></div>
   ${renderCategoryGrid(true)}
 
-  <div class="section-title"><h2>🔥 Low Affordable Prices Today</h2><button type="button" class="pill pill-btn" onclick="goTo('#/deals')">Up to ${MAX_DEAL_DISCOUNT}% off</button></div>
-  <div style="font-size:11px;color:var(--muted);margin:-8px 0 10px">Prices and coupon codes refresh automatically every day — today's picks for ${DAILY_KEY}.</div>
+  <div class="section-title"><h2>🛍️ Today's Picks</h2><button type="button" class="pill pill-btn" onclick="goTo('#/deals')">See all →</button></div>
+  <div style="font-size:11px;color:var(--muted);margin:-8px 0 10px">A rotating selection — tap through to check the real, current price at the store.</div>
   <div class="row-scroll">${deals.map(dealCard).join('')}</div>
 
   <div class="section-title"><h2>${rec.personalized ? '🎯 Recommended for you — based on your activity' : '⭐ Trending & Recommended for you'}</h2></div>
@@ -2134,9 +2129,9 @@ function renderCompareStores(){
   `;
 }
 function renderDeals(){
-  const all = [...PRODUCTS].sort((a,b)=>b.discountPct-a.discountPct);
+  const all = PRODUCTS;
   return `
-  <div class="section-title"><h2>🔥 Low Affordable Prices Today — up to ${MAX_DEAL_DISCOUNT}% off</h2><span class="pill">${all.length} items</span></div>
+  <div class="section-title"><h2>🛍️ Shop Picks</h2><span class="pill">${all.length} items</span></div>
   <div class="card" style="padding:14px;margin-bottom:14px">
     <div style="font-weight:800;margin-bottom:8px;font-size:13px">🔎 Compare prices across stores</div>
     <div style="display:flex;gap:8px;flex-wrap:wrap">
@@ -2149,7 +2144,7 @@ function renderDeals(){
       <button type="button" class="btn sm secondary" onclick="goTo('#/price-compare')">Full Price Compare →</button>
     </div>
   </div>
-  <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Prices and coupon codes both refresh automatically every day (today: ${DAILY_KEY}) — sorted biggest discount first. Tap "Copy" on any coupon, then use it at checkout.</div>
+  <div style="font-size:12px;color:var(--muted);margin-bottom:12px">Howitlooks doesn't set or display prices, discounts or coupon codes — tap through to any store to see its real, current price.</div>
   <div class="grid products">${all.map(dealCard).join('')}</div>
   `;
 }
@@ -2342,45 +2337,21 @@ function storeLinkFor(p){
 function productCard(p){
   return `
   <div class="card prod-card">
-    ${p.mrp>p.price ? `<span class="badge">${Math.round(100-(p.price/p.mrp*100))}% OFF</span>`:''}
     <button type="button" style="display:block;width:100%;padding:0;border:none;background:none;cursor:pointer" onclick="goTo('#/product/${p.id}')"><img class="thumb" src="${p.img}" data-fb="${p.imgFallback}" onerror="this.onerror=null;this.src=this.getAttribute('data-fb')" alt="${p.name}"></button>
     <div class="body">
       <div class="name">${p.name}</div>
-      <div>⭐ ${p.rating} <span style="color:var(--muted)">· ${cats(p.cat)}</span></div>
-      <div class="price">${fmt(p.price)}<span class="mrp">${fmt(p.mrp)}</span></div>
+      <div style="color:var(--muted)">${cats(p.cat)}</div>
       <div class="btnrow">
         <button class="btn sm" onclick="location.hash='#/product/${p.id}'">View</button>
-        <a class="btn sm secondary" style="display:inline-block;text-align:center" href="${storeLinkFor(p)}" target="_blank" rel="noopener sponsored" onclick="event.stopPropagation()">🛒 Buy →</a>
+        <a class="btn sm secondary" style="display:inline-block;text-align:center" href="${storeLinkFor(p)}" target="_blank" rel="noopener sponsored" onclick="event.stopPropagation()">🛒 Check price →</a>
       </div>
     </div>
   </div>`;
 }
-// Same as productCard() but adds a "ready to opt" coupon strip — used on the
-// Today's Deals page and the Home page deals row, where showing the coupon
-// matters most.
-function dealCard(p){
-  return `
-  <div class="card prod-card">
-    <span class="badge">${p.discountPct}% OFF</span>
-    <button type="button" style="display:block;width:100%;padding:0;border:none;background:none;cursor:pointer" onclick="goTo('#/product/${p.id}')"><img class="thumb" src="${p.img}" data-fb="${p.imgFallback}" onerror="this.onerror=null;this.src=this.getAttribute('data-fb')" alt="${p.name}"></button>
-    <div class="body">
-      <div class="name">${p.name}</div>
-      <div>⭐ ${p.rating} <span style="color:var(--muted)">· ${cats(p.cat)}</span></div>
-      <div class="price">${fmt(p.price)}<span class="mrp">${fmt(p.mrp)}</span></div>
-      <div class="card" style="padding:8px 10px;margin-top:8px;background:color-mix(in srgb,var(--good) 12%,var(--surface));border:1px dashed var(--good)">
-        <div style="font-size:10.5px;font-weight:800;color:var(--good);letter-spacing:.2px">🎟️ EXTRA ${p.couponExtraPct}% OFF WITH CODE</div>
-        <div style="display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:4px">
-          <code style="font-weight:800;letter-spacing:.5px;font-size:13px">${p.couponCode}</code>
-          <button type="button" class="btn sm" style="padding:4px 8px;font-size:11px" onclick="copyCoupon('${p.couponCode}', event)">Copy</button>
-        </div>
-      </div>
-      <div class="btnrow" style="margin-top:8px">
-        <button class="btn sm" onclick="location.hash='#/product/${p.id}'">View</button>
-        <a class="btn sm secondary" style="display:inline-block;text-align:center" href="${storeLinkFor(p)}" target="_blank" rel="noopener sponsored" onclick="event.stopPropagation()">🛒 Buy →</a>
-      </div>
-    </div>
-  </div>`;
-}
+// Howitlooks doesn't receive real price/discount data from Amazon or
+// Flipkart, so "deals" cards are visually identical to regular product
+// cards — no invented discount %, coupon code or star rating is ever shown.
+function dealCard(p){ return productCard(p); }
 function cats(id){ const c = CATS.find(c=>c.id===id); return c?c.label:id; }
 function addToCart(id){
   state.cart.push(id);
@@ -2408,15 +2379,6 @@ function doCheckout(){
     : `Opening the store in a new tab to complete your purchase`);
   goTo('#/home');
 }
-function copyCoupon(code, evt){
-  if(evt && evt.stopPropagation) evt.stopPropagation();
-  const done = ()=> flashToast(`Copied "${code}" — paste it at checkout for extra savings`);
-  if(navigator.clipboard && navigator.clipboard.writeText){
-    navigator.clipboard.writeText(code).then(done).catch(done);
-  } else {
-    done();
-  }
-}
 function trackProductView(id){
   state.viewedProducts = [id, ...state.viewedProducts.filter(x=>x!==id)].slice(0,20);
 }
@@ -2427,7 +2389,7 @@ function trackProductView(id){
    (recency-weighted) and cart contents (weighted higher), then fills any
    remaining slots with trending items so the section is never sparse. */
 function computeRecommendations(){
-  const fallback = { list:[...PRODUCTS].sort((a,b)=>b.rating-a.rating).slice(0,8), personalized:false };
+  const fallback = { list:TODAYS_DEALS, personalized:false };
   if(!isPremiumPlan()) return fallback;
   if(state.viewedProducts.length===0 && state.cart.length===0) return fallback;
 
@@ -2447,12 +2409,12 @@ function computeRecommendations(){
   const seenIds = new Set([...state.viewedProducts, ...state.cart]);
   const scored = PRODUCTS
     .filter(p=>!seenIds.has(p.id) && catWeight[p.cat])
-    .map(p=>({p, score:catWeight[p.cat]*10 + p.rating}))
+    .map(p=>({p, score:catWeight[p.cat]}))
     .sort((a,b)=>b.score-a.score);
   let list = scored.map(s=>s.p).slice(0,8);
   if(list.length < 8){
     const already = new Set(list.map(p=>p.id));
-    const filler = [...PRODUCTS].filter(p=>!seenIds.has(p.id) && !already.has(p.id)).sort((a,b)=>b.rating-a.rating);
+    const filler = [...PRODUCTS].filter(p=>!seenIds.has(p.id) && !already.has(p.id));
     list = list.concat(filler.slice(0, 8-list.length));
   }
   return { list, personalized:true };
@@ -2466,13 +2428,12 @@ function flashToast(msg){
 }
 function renderCart(){
   const items = state.cart.map(id=>PRODUCTS.find(p=>p.id===id)).filter(Boolean);
-  const total = items.reduce((s,p)=>s+p.price,0);
   return `
   <div class="section-title"><h2>🛒 Your Cart</h2></div>
   ${items.length===0? `<div class="empty-state">Your cart is empty. <button type="button" class="link-btn" style="font-size:inherit" onclick="goTo('#/home')">Continue shopping →</button></div>` : `
   <div class="card" style="padding:10px">
-    ${items.map(p=>`<div class="kv"><span>${p.name}</span><b>${fmt(p.price)}</b></div>`).join('')}
-    <div class="kv" style="font-size:16px;margin-top:8px"><span>Total</span><b>${fmt(total)}</b></div>
+    ${items.map(p=>`<div class="kv"><span>${p.name}</span></div>`).join('')}
+    <div style="font-size:12px;color:var(--muted);margin-top:4px">Howitlooks doesn't show prices here — you'll see each item's real, current price at the store.</div>
     <button class="btn block" style="margin-top:12px" onclick="doCheckout()">🛒 Checkout — Buy at Store →</button>
   </div>`}
   `;
@@ -2497,17 +2458,15 @@ function renderProduct(id){
     </div>
     <div>
       <h2>${p.name}</h2>
-      <div>⭐ ${p.rating} · ${cats(p.cat)}</div>
-      <div class="price" style="font-size:24px;margin:10px 0">${fmt(p.price)} <span class="mrp" style="color:var(--muted);text-decoration:line-through;font-size:14px;margin-left:10px">${fmt(p.mrp)}</span></div>    <div class="btnrow">
+      <div style="color:var(--muted)">${cats(p.cat)}</div>
+      <div class="btnrow" style="margin-top:10px">
         <button class="btn" onclick="addToCart('${p.id}')">🛒 Add to Cart</button>
         <button class="btn accent" onclick="location.hash='#/price/${p.id}'">💰 Compare Prices</button>
       </div>
       <div class="btnrow">
         <button class="btn secondary" onclick="${canUsePriceAlerts()?`toggleWatchPrice('${p.id}')`:`goTo('#/premium')`}">${isWatchingPrice(p.id)?'✅ Watching this price':'🔔 Watch Price'} ${canUsePriceAlerts()?'':'🔒'}</button>
       </div>
-      <h3 style="margin-top:20px">Reviews</h3>
-      ${[1,2].map(i=>`<div class="card" style="padding:10px;margin-bottom:8px"><b>User ${i===1?'Aisha':'Rahul'}</b> — ⭐ ${(4+i*0.1).toFixed(1)}<div style="font-size:13px;color:var(--text-secondary);margin-top:4px">${i===1?'Matches the AI preview really well, great quality for the price.':'Delivery was fast, AR try-on helped me confirm the size.'}</div></div>`).join('')}
-      <div class="disclaimer">AI-generated previews are illustrative. Actual product appearance, colors, sizes and measurements may vary.</div>
+      <div class="disclaimer">AI-generated previews are illustrative. Actual product appearance, colors, sizes and measurements may vary. Howitlooks doesn't set or display prices, discounts or ratings — tap "Compare Prices" to see real, current prices at each store.</div>
     </div>
   </div>
   `;
@@ -2799,33 +2758,8 @@ const SIMILAR_TIERS = [
   {tag:'⭐ Top rated', mult:1.9}, {tag:'⭐ Premium', mult:2.3},
   {tag:'⭐ Luxury pick', mult:3.0},
 ];
-// No category chips anymore — this is the only signal we have about the
-// product's likely price range, so it's a best-effort keyword guess purely
-// for showing plausible demo price tiers. It never affects which stores or
-// search terms are used (that's always exactly what the user typed/said).
-const PRICE_GUESS_TABLE = [
-  [['tv','television'], 24999], [['fridge','refrigerator'], 15999],
-  [['ac','air conditioner','airconditioner'], 28999], [['washing machine','washer'], 17999],
-  [['laptop','notebook'], 39999], [['mobile','phone','smartphone','iphone'], 12999],
-  [['watch'], 2499], [['shoe','sneaker','sandal','footwear'], 1899],
-  [['bag','handbag','backpack'], 2199], [['dress','shirt','kurti','saree','clothing'], 1299],
-  [['sofa','furniture','table','chair','bed','cupboard','wardrobe'], 4999],
-  [['jewellery','jewelry','necklace','earring','ring'], 3999],
-];
-function guessBasePrice(desc){
-  const d = (desc||'').toLowerCase();
-  for(const [keys, price] of PRICE_GUESS_TABLE){
-    if(keys.some(k=>d.includes(k))) return price;
-  }
-  return 1499;
-}
 function similarProductsFor(query){
-  const base = guessBasePrice(query);
-  return SIMILAR_TIERS.map(t=>({
-    tag:t.tag,
-    price: Math.round(base*t.mult/10)*10,
-    coupon: couponCodeFor(query + '|' + t.tag),
-  }));
+  return SIMILAR_TIERS.map(t=>({ tag:t.tag }));
 }
 function renderSimilarProducts(){
   // The description box is now mandatory before a photo can even be
@@ -2842,16 +2776,10 @@ function renderSimilarProducts(){
   const items = similarProductsFor(searchQuery);
   return `<div class="card" style="padding:16px;margin-top:14px">
     <div style="font-weight:800;margin-bottom:4px">🔎 Similar products in other stores — Amazon, Flipkart, Myntra, Meesho, Snapdeal &amp; Ajio</div>
-    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Searching for: <b>"${desc}"</b>. Prices are indicative for this demo. Each row has a ready-to-opt coupon code that refreshes daily (today: ${DAILY_KEY}) — tap Copy, then tap a store to see real, live results and apply it at checkout.</div>
+    <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Searching for: <b>"${desc}"</b>. Howitlooks doesn't set or guess prices — tap a store below to see its real, current results.</div>
     ${items.map(it=>`
       <div style="padding:10px 0;border-bottom:1px solid var(--border)">
-        <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
-          <div><div style="font-weight:700">${it.tag}</div><div style="font-size:13px;color:var(--text-secondary)">${fmt(it.price)} (approx.)</div></div>
-          <div style="display:flex;align-items:center;gap:6px">
-            <code style="font-weight:800;font-size:12.5px">${it.coupon}</code>
-            <button type="button" class="btn sm secondary" style="padding:4px 8px;font-size:11px" onclick="copyCoupon('${it.coupon}', event)">Copy</button>
-          </div>
-        </div>
+        <div style="font-weight:700">${it.tag}</div>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px">
           <a class="btn" style="padding:6px 10px;font-size:12px" href="${amazonLink(searchQuery)}" target="_blank" rel="noopener">Amazon</a>
           <a class="btn" style="padding:6px 10px;font-size:12px" href="${flipkartLink(searchQuery)}" target="_blank" rel="noopener">Flipkart</a>
@@ -3635,14 +3563,11 @@ function finishRoomSnapshot(ctx, canvas, W, H, productImg, productName){
   flashToast('📸 Room snapshot captured ✓');
 }
 
-/* ---------------- Price-drop alerts (Premium feature) ----------------
-   "Watch" a product's price; while you're on the Price Watch page, the app
-   periodically checks watched items and — since this prototype has no real
-   retailer price-feed integration — simulates an occasional price drop for
-   demo purposes, then raises a real browser/OS notification via the
-   service worker (falling back to the in-page Notification API, then just
-   an in-app toast if permission was never granted). Watchlist + alert
-   history persist to localStorage so they survive closing and reopening
+/* ---------------- Price Watch bookmark list (Premium feature) ----------------
+   Howitlooks has no live retailer price-feed integration, so this is a
+   plain "save it, check back later" bookmark list — it never generates,
+   stores or displays a price, a discount, or a simulated price drop.
+   The list persists to localStorage so it survives closing and reopening
    the app, unlike the rest of this prototype's in-memory-only state. */
 const PRICE_WATCH_STORAGE_KEY = 'howitlooks_price_watch_v1';
 function loadPriceWatchState(){
@@ -3652,8 +3577,6 @@ function loadPriceWatchState(){
     const saved = JSON.parse(raw);
     if(saved && typeof saved==='object'){
       state.priceWatchlist = Array.isArray(saved.priceWatchlist) ? saved.priceWatchlist : [];
-      state.priceAlerts = Array.isArray(saved.priceAlerts) ? saved.priceAlerts : [];
-      state.priceOverrides = (saved.priceOverrides && typeof saved.priceOverrides==='object') ? saved.priceOverrides : {};
     }
   }catch(e){ /* localStorage unavailable (private mode etc.) — just start fresh */ }
 }
@@ -3661,13 +3584,10 @@ function savePriceWatchState(){
   try{
     localStorage.setItem(PRICE_WATCH_STORAGE_KEY, JSON.stringify({
       priceWatchlist: state.priceWatchlist,
-      priceAlerts: state.priceAlerts,
-      priceOverrides: state.priceOverrides,
     }));
-  }catch(e){ /* ignore — alerts just won't persist this session */ }
+  }catch(e){ /* ignore — the list just won't persist this session */ }
 }
 function isWatchingPrice(id){ return state.priceWatchlist.some(w=>w.id===id); }
-function watchedCurrentPrice(p){ return (state.priceOverrides && state.priceOverrides[p.id]!=null) ? state.priceOverrides[p.id] : p.price; }
 function toggleWatchPrice(id){
   if(!canUsePriceAlerts()){ goTo('#/premium'); return; }
   const p = PRODUCTS.find(pp=>pp.id===id);
@@ -3675,131 +3595,49 @@ function toggleWatchPrice(id){
   const idx = state.priceWatchlist.findIndex(w=>w.id===id);
   if(idx>=0){
     state.priceWatchlist.splice(idx,1);
-    delete state.priceOverrides[id];
-    flashToast(`Stopped watching "${p.name}"`);
+    flashToast(`Removed "${p.name}" from your watchlist`);
   }else{
-    state.priceWatchlist.push({id, watchedPrice:p.price, addedAt:Date.now()});
-    flashToast(`🔔 Watching "${p.name}" for price drops`);
-    ensureNotificationPermission();
+    state.priceWatchlist.push({id, addedAt:Date.now()});
+    flashToast(`🔖 Saved "${p.name}" to your watchlist`);
   }
   savePriceWatchState();
   render();
 }
-async function ensureNotificationPermission(){
-  if(!('Notification' in window)) return 'unsupported';
-  if(Notification.permission==='granted' || Notification.permission==='denied') return Notification.permission;
-  try{ return await Notification.requestPermission(); }catch(e){ return 'denied'; }
-}
-function firePriceDropNotification(name, oldPrice, newPrice){
-  const title = '💸 Price drop on your watchlist';
-  const body = `${name}: ${fmt(oldPrice)} → ${fmt(newPrice)}`;
-  if('Notification' in window && Notification.permission==='granted'){
-    if(navigator.serviceWorker && navigator.serviceWorker.ready){
-      navigator.serviceWorker.ready.then(reg=>{
-        if(reg && reg.showNotification){
-          reg.showNotification(title, {body, icon:'./icon-192.png', badge:'./icon-192.png', tag:'price-drop-'+name});
-        }else{
-          try{ new Notification(title, {body}); }catch(e){}
-        }
-      }).catch(()=>{ try{ new Notification(title, {body}); }catch(e){} });
-    }else{
-      try{ new Notification(title, {body}); }catch(e){}
-    }
-  }
-  flashToast(`💸 Price drop: ${name} → ${fmt(newPrice)}`);
-}
-/* Demo-only simulation: real price monitoring would poll retailer price
-   feeds server-side. Here, each watched item has a small chance per check
-   of a further 5-15% cut (capped so it can't spiral below ~75% of the
-   price you started watching at), purely so the alert flow is genuinely
-   testable end-to-end without a backend. */
-function simulatePriceCheck(){
-  let changed = false;
-  state.priceWatchlist.forEach(w=>{
-    const p = PRODUCTS.find(pp=>pp.id===w.id);
-    if(!p) return;
-    const cur = watchedCurrentPrice(p);
-    if(cur <= Math.round(w.watchedPrice*0.75)) return;
-    if(Math.random() < 0.3){
-      const dropPct = 0.05 + Math.random()*0.10;
-      const newPrice = Math.max(1, Math.round(cur * (1-dropPct)));
-      if(newPrice < cur){
-        state.priceOverrides[p.id] = newPrice;
-        state.priceAlerts.unshift({id:p.id, name:p.name, oldPrice:cur, newPrice, at:Date.now()});
-        state.priceAlerts = state.priceAlerts.slice(0,20);
-        firePriceDropNotification(p.name, cur, newPrice);
-        changed = true;
-      }
-    }
-  });
-  if(changed) savePriceWatchState();
-  return changed;
-}
-let priceWatchIntervalId = null;
-function startPriceWatchInterval(){
-  if(priceWatchIntervalId) return;
-  priceWatchIntervalId = setInterval(()=>{
-    const root = location.hash.replace(/^#\//,'').split('/')[0] || 'home';
-    if(root !== 'price-watch'){ stopPriceWatchInterval(); return; }
-    if(simulatePriceCheck()) render();
-  }, 8000);
-}
-function stopPriceWatchInterval(){
-  if(priceWatchIntervalId){ clearInterval(priceWatchIntervalId); priceWatchIntervalId = null; }
-}
+// No-ops kept so existing render()/afterRender() call sites don't need
+// changes — there's no live price feed to poll, so there's nothing to do.
+function startPriceWatchInterval(){}
+function stopPriceWatchInterval(){}
 function renderPriceWatch(){
   if(!canUsePriceAlerts()){
     return `
-    <div class="section-title"><h2>🔔 Price Watch</h2></div>
+    <div class="section-title"><h2>🔖 Price Watch</h2></div>
     <div class="card" style="padding:22px;text-align:center;background:linear-gradient(120deg,var(--accent),var(--yellow));color:#fff">
       <div style="font-size:38px">🔒</div>
-      <h3 style="margin:8px 0 4px">Price-drop alerts are a Premium feature</h3>
-      <p style="font-size:13px;opacity:.95;max-width:440px;margin:0 auto 14px">Watch any product's price and get notified the moment it drops. Included from the Premium plan (₹299/mo) upward.</p>
+      <h3 style="margin:8px 0 4px">Price Watch is a Premium feature</h3>
+      <p style="font-size:13px;opacity:.95;max-width:440px;margin:0 auto 14px">Bookmark products here to check back on later. Included from the Premium plan (₹299/mo) upward.</p>
       <button class="btn" style="background:#fff;color:var(--accent-dark)" onclick="goTo('#/premium')">Upgrade to Premium →</button>
     </div>
     `;
   }
   const watched = state.priceWatchlist.map(w=>({w, p:PRODUCTS.find(p=>p.id===w.id)})).filter(x=>x.p);
-  const notifState = ('Notification' in window) ? Notification.permission : 'unsupported';
   return `
-  <div class="section-title"><h2>🔔 Price Watch</h2></div>
-  ${notifState==='default' ? `
-    <div class="card" style="padding:12px 16px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
-      <div style="font-size:13px">Turn on notifications so you're alerted even when Howitlooks isn't open.</div>
-      <button class="btn sm" onclick="ensureNotificationPermission().then(()=>render())">🔔 Enable Notifications</button>
-    </div>
-  ` : notifState==='denied' ? `
-    <div class="card" style="padding:12px 16px;margin-bottom:12px;font-size:12.5px;color:var(--text-secondary)">🔕 Notifications are blocked in your browser settings — you'll still see price drops here and as an in-app toast while Howitlooks is open.</div>
-  ` : ''}
+  <div class="section-title"><h2>🔖 Price Watch</h2></div>
   ${watched.length===0 ? `
-    <div class="empty-state">You're not watching any prices yet. Open a product and tap "🔔 Watch Price" to add one. <button type="button" class="link-btn" style="font-size:inherit" onclick="goTo('#/home')">Browse products →</button></div>
+    <div class="empty-state">You haven't bookmarked anything yet. Open a product and tap "🔔 Watch Price" to save it here. <button type="button" class="link-btn" style="font-size:inherit" onclick="goTo('#/home')">Browse products →</button></div>
   ` : `
-    <div class="grid products">${watched.map(({w,p})=>{
-      const cur = watchedCurrentPrice(p);
-      const dropped = cur < w.watchedPrice;
-      return `
+    <div class="grid products">${watched.map(({p})=>`
       <div class="card prod-card">
-        ${dropped ? `<span class="badge" style="background:var(--good)">▼ ${Math.round(100-(cur/w.watchedPrice*100))}% drop</span>`:''}
         <button type="button" style="display:block;width:100%;padding:0;border:none;background:none;cursor:pointer" onclick="goTo('#/product/${p.id}')"><img class="thumb" src="${p.img}" data-fb="${p.imgFallback}" onerror="this.onerror=null;this.src=this.getAttribute('data-fb')" alt="${p.name}"></button>
         <div class="body">
           <div class="name">${p.name}</div>
-          <div style="font-size:12px;color:var(--text-secondary)">Watching since ${fmt(w.watchedPrice)}</div>
-          <div class="price">${fmt(cur)}${dropped?`<span class="mrp">${fmt(w.watchedPrice)}</span>`:''}</div>
           <div class="btnrow">
             <button class="btn sm" onclick="location.hash='#/product/${p.id}'">View</button>
-            <button class="btn sm secondary" onclick="toggleWatchPrice('${p.id}')">🔕 Stop</button>
+            <button class="btn sm secondary" onclick="toggleWatchPrice('${p.id}')">🔕 Remove</button>
           </div>
         </div>
-      </div>`;
-    }).join('')}</div>
+      </div>`).join('')}</div>
   `}
-  ${state.priceAlerts.length>0 ? `
-    <div class="section-title" style="margin-top:20px"><h2>📜 Recent alerts</h2></div>
-    <div class="card" style="padding:10px">
-      ${state.priceAlerts.slice(0,10).map(a=>`<div class="kv"><span>${a.name}</span><b>${fmt(a.oldPrice)} → ${fmt(a.newPrice)}</b></div>`).join('')}
-    </div>
-  ` : ''}
-  <div class="disclaimer">⚠️ Demo simulation: this prototype has no live retailer price-feed integration, so watched prices are checked and occasionally nudged down automatically while this page is open, purely to demonstrate the alert flow end-to-end. A production version would poll real store prices server-side instead.</div>
+  <div class="disclaimer">Howitlooks has no live retailer price feed, so this is a plain bookmark list — it doesn't track, estimate or alert on real price changes. Tap "Compare Prices" on a product page to check its real, current price at each store.</div>
   `;
 }
 
@@ -3835,30 +3673,25 @@ function renderPriceHub(){
 }
 function renderPrice(id){
   const p = PRODUCTS.find(p=>p.id===id) || PRODUCTS[0];
-  const rows = priceRows(p.price);
   return `
   <div class="section-title"><h2>💰 Compare Prices — ${p.name}</h2></div>
+  <div style="font-size:12px;color:var(--text-secondary);margin-bottom:10px">Howitlooks doesn't receive live price data from these stores, so no price is shown here — tap through to see each store's real, current price.</div>
   <div class="card" style="padding:0;overflow:hidden">
     <table>
-      <thead><tr><th>Partner</th><th>Price</th><th>Delivery</th><th>ETA</th><th></th></tr></thead>
+      <thead><tr><th>Partner</th><th></th></tr></thead>
       <tbody>
-      ${rows.map((r,i)=>`
+      ${AFFILIATES.map((a)=>`
         <tr>
-          <td><b style="color:${r.color}">${r.partner}</b>${i===0?' <span class="pill">Best price</span>':''}</td>
-          <td><b>${fmt(r.price)}</b></td>
-          <td>${r.delivery}</td>
-          <td>${r.eta}</td>
-          <td>${r.partner==='Ajio' && AJIO_TRACKED_LINKS[p.id]
-            ? `<a class="btn sm" style="background:${r.color};display:inline-block" href="${AJIO_TRACKED_LINKS[p.id]}" target="_blank" rel="noopener sponsored">Buy →</a>`
-            : PARTNER_LINK_BUILDERS[r.partner]
-            ? `<a class="btn sm" style="background:${r.color};display:inline-block" href="${PARTNER_LINK_BUILDERS[r.partner](p.name)}" target="_blank" rel="noopener sponsored">Buy →</a>`
-            : `<button class="btn sm" style="background:${r.color}" onclick="flashToast('Redirecting to ${r.partner}...')">Buy →</button>`}</td>
+          <td><b style="color:${a.color}">${a.name}</b></td>
+          <td>${a.name==='Ajio' && AJIO_TRACKED_LINKS[p.id]
+            ? `<a class="btn sm" style="background:${a.color};display:inline-block" href="${AJIO_TRACKED_LINKS[p.id]}" target="_blank" rel="noopener sponsored">Check price →</a>`
+            : `<a class="btn sm" style="background:${a.color};display:inline-block" href="${PARTNER_LINK_BUILDERS[a.name](p.name)}" target="_blank" rel="noopener sponsored">Check price →</a>`}</td>
         </tr>
       `).join('')}
       </tbody>
     </table>
   </div>
-  <div class="disclaimer">Prices shown are simulated for demo purposes and refreshed periodically from affiliate partner feeds in production.</div>
+  <div class="disclaimer">Howitlooks compares stores, not prices — we never display a price, discount or offer we didn't get directly from the store itself.</div>
   `;
 }
 
