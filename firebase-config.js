@@ -12,7 +12,6 @@
       and enable the providers you want to be real:
         - Email/Password  — powers the main Login/Create Account forms.
         - Google          — powers the Google button.
-        - Phone           — powers OTP login (also needs step 5 below).
         - Anonymous       — powers "Continue as Guest" as a real session.
       Facebook and Apple can be enabled the same way, but each needs extra
       setup outside Firebase first: Facebook needs a free Facebook Developer
@@ -25,23 +24,19 @@
       database. Start in test mode while you're developing; before you go
       live, lock it down with real security rules (Firebase's docs cover
       this under "Firestore Security Rules").
-   5. For Phone/OTP specifically: Firebase needs to run an invisible
-      reCAPTCHA check, which only works when the app is served over a real
-      http(s):// domain (not opened as a local file://) — this is already
-      handled by the app (see the otpRecaptchaContainer div and
-      isFirebaseLive() checks in index.html), you just need real hosting.
 
    Until you fill in real values here, Howitlooks keeps running in its
    original demo mode — simulated login, nothing persisted, exactly as
    before. Nothing else breaks; add this whenever you're ready.
    ============================================================ */
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_PROJECT_ID.firebaseapp.com",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_PROJECT_ID.appspot.com",
-  messagingSenderId: "YOUR_SENDER_ID",
-  appId: "YOUR_APP_ID",
+  apiKey: "AIzaSyCPUw2z3YHVrJzq-MOtlLWUzQnx6iM-QsU",
+  authDomain: "howitlooks-5bd3e.firebaseapp.com",
+  projectId: "howitlooks-5bd3e",
+  storageBucket: "howitlooks-5bd3e.firebasestorage.app",
+  messagingSenderId: "302027503111",
+  appId: "1:302027503111:web:123aff4613ce6b222edca2",
+  measurementId: "G-3NEXG13R6G",
 };
 
 const FIREBASE_ENABLED = !!(firebaseConfig.apiKey && firebaseConfig.apiKey !== 'YOUR_API_KEY');
