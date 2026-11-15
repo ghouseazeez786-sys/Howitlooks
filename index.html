@@ -1617,8 +1617,7 @@ function renderLogin(){
             <button class="${mode==='register'?'active':''}" onclick="setAuthMode('register')">Create Account</button>
           </div>` : ''}
           ${mode==='register' ? renderRegisterForm() : mode==='forgot' ? renderForgotForm() : mode==='otp' ? renderOtpForm() : mode==='social' ? renderSocialForm() : renderLoginForm()}
-          <div class="disclaimer">${isFirebaseLive() ? '🔥 Connected to Firebase — Email/Password, Google, Facebook, Apple and Phone OTP sign-in are real. Facebook/Apple additionally need that provider enabled in your Firebase console before they\'ll work.' : 'Demo auth flow — no real authentication happens and no data is transmitted anywhere. Email/phone format is checked, but any correctly-formatted value is accepted (there\'s no real account to verify against). Connect a Firebase project in firebase-config.js to make this real.'}</div>
-          <div id="otpRecaptchaContainer"></div>
+          <div class="disclaimer">${isFirebaseLive() ? '🔥 Connected to Firebase — Email/Password, Google, Facebook and Apple sign-in are real. Facebook/Apple additionally need that provider enabled in your Firebase console before they\'ll work.' : 'Demo auth flow — no real authentication happens and no data is transmitted anywhere. Email/phone format is checked, but any correctly-formatted value is accepted (there\'s no real account to verify against). Connect a Firebase project in firebase-config.js to make this real.'}</div>
         </div>
       </div>
     </div>
@@ -1644,7 +1643,6 @@ function renderLoginForm(){
       <button class="btn secondary" onclick="startSocialLogin('Google')">🔵 Google</button>
       <button class="btn secondary" onclick="startSocialLogin('Apple')">⬛ Apple</button>
       <button class="btn secondary" onclick="startSocialLogin('Facebook')">🔷 Facebook</button>
-      <button class="btn secondary" onclick="setAuthMode('otp')">📱 OTP</button>
     </div>
     <button class="btn accent block" style="margin-top:10px" onclick="doLogin('Guest')">Continue as Guest</button>
     <div style="text-align:center;margin-top:10px;font-size:13px">New here? <button type="button" class="link-btn" onclick="setAuthMode('register')">Register</button></div>
