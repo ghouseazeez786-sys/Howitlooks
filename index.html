@@ -985,201 +985,11 @@ const AFFILIATES = [
   {name:'Meesho', color:'#4a3aa7'}, {name:'Snapdeal', color:'#e87ba4'}, {name:'Ajio', color:'#1baf7a'},
 ];
 
-/* Each hospital lists the diseases/conditions it treats along with an
-   approximate cost tier, so the "which hospital is cheapest for my
-   condition" dropdown on the Hospitals page can filter + sort by real
-   (illustrative) numbers instead of just a blanket Free/Low-cost label. */
-const HOSPITALS = [
-  {name:'Sunrise Government Hospital', city:'Hyderabad', address:'Road No. 5, Banjara Hills, Hyderabad, Telangana – 500034', type:'Free', beds:500, phone:'040-2244 5566', bloodbank:true,
-    diseases:[{name:'Diabetes',tier:'Free',cost:0},{name:'Cardiac Care',tier:'Free',cost:0},{name:'Maternity',tier:'Free',cost:0},{name:'TB Treatment',tier:'Free',cost:0}]},
-  {name:'Apex Community Health Centre', city:'Chennai', address:'Anna Salai, Teynampet, Chennai, Tamil Nadu – 600018', type:'Free', beds:80, phone:'044-3344 5566', bloodbank:true,
-    diseases:[{name:'General Surgery',tier:'Free',cost:0},{name:'Maternity',tier:'Free',cost:0},{name:'Eye Care / Cataract',tier:'Free',cost:0}]},
-  {name:'Rural Poor Welfare Hospital', city:'Lucknow', address:'Sitapur Road, Aliganj, Lucknow, Uttar Pradesh – 226024', type:'Free', beds:150, phone:'0522-234 5678', bloodbank:true,
-    diseases:[{name:'TB Treatment',tier:'Free',cost:0},{name:'Diabetes',tier:'Free',cost:0},{name:'Mental Health',tier:'Free',cost:0}]},
-  {name:'Jan Arogya Govt Hospital', city:'Jaipur', address:'Jawahar Lal Nehru Marg, Malviya Nagar, Jaipur, Rajasthan – 302017', type:'Free', beds:300, phone:'0141-234 5678', bloodbank:true,
-    diseases:[{name:'Cancer Treatment',tier:'Low-cost',cost:8000},{name:'Kidney / Dialysis',tier:'Low-cost',cost:1200},{name:'Orthopedic',tier:'Free',cost:0}]},
-  {name:'City Care Multi-Speciality', city:'Hyderabad', address:'Ameerpet Main Road, Ameerpet, Hyderabad, Telangana – 500016', type:'Low-cost', beds:220, phone:'040-2233 4455', bloodbank:true,
-    diseases:[{name:'Cardiac Care',tier:'Low-cost',cost:35000},{name:'Orthopedic',tier:'Low-cost',cost:18000},{name:'Kidney / Dialysis',tier:'Low-cost',cost:1500}]},
-  {name:'LifeLine Trust Hospital', city:'Bengaluru', address:'Bannerghatta Road, JP Nagar, Bengaluru, Karnataka – 560078', type:'Low-cost', beds:150, phone:'080-4455 6677', bloodbank:false,
-    diseases:[{name:'Cancer Treatment',tier:'Low-cost',cost:45000},{name:'Cardiac Care',tier:'Low-cost',cost:60000},{name:'Eye Care / Cataract',tier:'Low-cost',cost:6000}]},
-  {name:'Om Sai Charitable Hospital', city:'Pune', address:'Karve Road, Kothrud, Pune, Maharashtra – 411038', type:'Low-cost', beds:120, phone:'020-2345 6789', bloodbank:false,
-    diseases:[{name:'General Surgery',tier:'Low-cost',cost:12000},{name:'Maternity',tier:'Low-cost',cost:9000},{name:'Diabetes',tier:'Low-cost',cost:1500}]},
-  {name:'Prayas Charitable Trust Hospital', city:'Mumbai', address:'LBS Marg, Kurla West, Mumbai, Maharashtra – 400070', type:'Low-cost', beds:180, phone:'022-2345 6789', bloodbank:true,
-    diseases:[{name:'Kidney / Dialysis',tier:'Low-cost',cost:800},{name:'TB Treatment',tier:'Free',cost:0},{name:'Cancer Treatment',tier:'Low-cost',cost:30000}]},
-  {name:'National Heart & Cardiac Institute', city:'Delhi', address:'Mathura Road, Sarita Vihar, New Delhi – 110076', type:'Paid', beds:400, phone:'011-2345 6789', bloodbank:true,
-    diseases:[{name:'Cardiac Care',tier:'Paid',cost:180000},{name:'General Surgery',tier:'Paid',cost:55000}]},
-  {name:'Metro Speciality Hospital', city:'Kolkata', address:'AJC Bose Road, Park Circus, Kolkata, West Bengal – 700017', type:'Paid', beds:260, phone:'033-2345 6789', bloodbank:true,
-    diseases:[{name:'Orthopedic',tier:'Paid',cost:95000},{name:'Cancer Treatment',tier:'Paid',cost:210000},{name:'Eye Care / Cataract',tier:'Paid',cost:22000}]},
-  {name:'Ahmedabad Civil Government Hospital', city:'Ahmedabad', address:'Asarwa Road, Asarwa, Ahmedabad, Gujarat – 380016', type:'Free', beds:600, phone:'079-2345 6789', bloodbank:true,
-    diseases:[{name:'Maternity',tier:'Free',cost:0},{name:'General Surgery',tier:'Free',cost:0},{name:'Mental Health',tier:'Free',cost:0}]},
-  {name:'Sneha Mother & Child Care', city:'Chennai', address:'GST Road, Chrompet, Chennai, Tamil Nadu – 600044', type:'Low-cost', beds:90, phone:'044-2233 8899', bloodbank:false,
-    diseases:[{name:'Maternity',tier:'Low-cost',cost:7000}]},
-  {name:'Kochi General Government Hospital', city:'Kochi', address:'Banerji Road, Ernakulam North, Kochi, Kerala – 682018', type:'Free', beds:350, phone:'0484-234 5566', bloodbank:true,
-    diseases:[{name:'Diabetes',tier:'Free',cost:0},{name:'Maternity',tier:'Free',cost:0},{name:'General Surgery',tier:'Free',cost:0},{name:'Eye Care / Cataract',tier:'Free',cost:0}]},
-  {name:'Hamidia District Hospital', city:'Bhopal', address:'Sultania Road, Old Bhopal, Bhopal, Madhya Pradesh – 462001', type:'Free', beds:400, phone:'0755-234 5566', bloodbank:true,
-    diseases:[{name:'TB Treatment',tier:'Free',cost:0},{name:'Orthopedic',tier:'Free',cost:0},{name:'Maternity',tier:'Free',cost:0}]},
-  {name:'Patna Medical Relief Hospital', city:'Patna', address:'Ashok Rajpath, Patna, Bihar – 800004', type:'Free', beds:280, phone:'0612-234 5566', bloodbank:true,
-    diseases:[{name:'Diabetes',tier:'Free',cost:0},{name:'Cardiac Care',tier:'Low-cost',cost:28000},{name:'TB Treatment',tier:'Free',cost:0}]},
-  {name:'Orange City Charitable Hospital', city:'Nagpur', address:'Wardha Road, Dharampeth, Nagpur, Maharashtra – 440010', type:'Low-cost', beds:140, phone:'0712-234 5566', bloodbank:false,
-    diseases:[{name:'Cancer Treatment',tier:'Low-cost',cost:38000},{name:'Kidney / Dialysis',tier:'Low-cost',cost:1000},{name:'Orthopedic',tier:'Low-cost',cost:16000}]},
-  {name:'Malwa Charitable Trust Hospital', city:'Indore', address:'AB Road, Palasia, Indore, Madhya Pradesh – 452001', type:'Low-cost', beds:130, phone:'0731-234 5566', bloodbank:false,
-    diseases:[{name:'General Surgery',tier:'Low-cost',cost:11000},{name:'Diabetes',tier:'Low-cost',cost:1200},{name:'Eye Care / Cataract',tier:'Low-cost',cost:5500}]},
-  {name:'Sukhmani Multi-Speciality Hospital', city:'Chandigarh', address:'Sector 34-A, Chandigarh – 160022', type:'Paid', beds:200, phone:'0172-234 5566', bloodbank:true,
-    diseases:[{name:'Cardiac Care',tier:'Paid',cost:165000},{name:'Orthopedic',tier:'Paid',cost:85000},{name:'Cancer Treatment',tier:'Paid',cost:195000}]},
-  {name:'Kaveri Charitable Health Centre', city:'Coimbatore', address:'Avinashi Road, Peelamedu, Coimbatore, Tamil Nadu – 641004', type:'Low-cost', beds:110, phone:'0422-234 5566', bloodbank:false,
-    diseases:[{name:'Cardiac Care',tier:'Low-cost',cost:32000},{name:'Diabetes',tier:'Low-cost',cost:1400},{name:'Maternity',tier:'Low-cost',cost:8000}]},
-  {name:'Brahmaputra Government Medical Centre', city:'Guwahati', address:'GS Road, Christian Basti, Guwahati, Assam – 781005', type:'Free', beds:320, phone:'0361-234 5566', bloodbank:true,
-    diseases:[{name:'Maternity',tier:'Free',cost:0},{name:'TB Treatment',tier:'Free',cost:0},{name:'Mental Health',tier:'Free',cost:0}]},
-  {name:'Surat Diamond City Hospital', city:'Surat', address:'Ring Road, Athwa, Surat, Gujarat – 395001', type:'Paid', beds:230, phone:'0261-234 5566', bloodbank:true,
-    diseases:[{name:'Orthopedic',tier:'Paid',cost:78000},{name:'Kidney / Dialysis',tier:'Paid',cost:4500},{name:'Eye Care / Cataract',tier:'Paid',cost:19000}]},
-  {name:'Kalinga Charitable Hospital', city:'Bhubaneswar', address:'Jaydev Vihar, Bhubaneswar, Odisha – 751013', type:'Low-cost', beds:100, phone:'0674-234 5566', bloodbank:false,
-    diseases:[{name:'Cancer Treatment',tier:'Low-cost',cost:42000},{name:'General Surgery',tier:'Low-cost',cost:13000}]},
-  {name:'Yashoda Government Hospital', city:'Hyderabad', address:'Somajiguda, Hyderabad, Telangana – 500082', type:'Free', beds:450, phone:'040-2233 7788', bloodbank:true,
-    diseases:[{name:'Cancer Treatment',tier:'Low-cost',cost:9000},{name:'Kidney / Dialysis',tier:'Free',cost:0},{name:'Orthopedic',tier:'Free',cost:0}]},
-  {name:'Sanjeevani Multi-Speciality Hospital', city:'Bengaluru', address:'Old Airport Road, Indiranagar, Bengaluru, Karnataka – 560038', type:'Paid', beds:280, phone:'080-4455 9900', bloodbank:true,
-    diseases:[{name:'Cardiac Care',tier:'Paid',cost:175000},{name:'Cancer Treatment',tier:'Paid',cost:220000},{name:'Orthopedic',tier:'Paid',cost:90000}]},
-  {name:'NIMHANS (National Institute of Mental Health & Neurosciences)', city:'Bengaluru', address:'Hosur Road, Bengaluru, Karnataka – 560029', type:'Free', beds:1096, phone:'080-2699 5000', bloodbank:true,
-    diseases:[{name:'Mental Health',tier:'Free',cost:0},{name:'Neurology',tier:'Low-cost',cost:2500}]},
-  {name:'Deccan Diabetes & Eye Care Centre', city:'Hyderabad', address:'Tarnaka, Secunderabad, Hyderabad, Telangana – 500017', type:'Low-cost', beds:60, phone:'040-2233 1122', bloodbank:false,
-    diseases:[{name:'Diabetes',tier:'Low-cost',cost:900},{name:'Eye Care / Cataract',tier:'Low-cost',cost:4800}]},
-  {name:'Mumbai Port Trust Hospital', city:'Mumbai', address:'Wadala Truck Terminal Road, Wadala, Mumbai, Maharashtra – 400037', type:'Free', beds:220, phone:'022-2345 1122', bloodbank:true,
-    diseases:[{name:'General Surgery',tier:'Free',cost:0},{name:'Maternity',tier:'Free',cost:0},{name:'Orthopedic',tier:'Low-cost',cost:14000}]},
-  {name:'Safdarjung Govt Hospital Annex', city:'Delhi', address:'Ansari Nagar, New Delhi – 110029', type:'Free', beds:700, phone:'011-2345 3344', bloodbank:true,
-    diseases:[{name:'Maternity',tier:'Free',cost:0},{name:'TB Treatment',tier:'Free',cost:0},{name:'Kidney / Dialysis',tier:'Free',cost:0},{name:'Mental Health',tier:'Free',cost:0}]},
-  {name:'Salt Lake Charitable Nursing Home', city:'Kolkata', address:'Sector V, Salt Lake City, Kolkata, West Bengal – 700091', type:'Low-cost', beds:85, phone:'033-2345 5544', bloodbank:false,
-    diseases:[{name:'Maternity',tier:'Low-cost',cost:6500},{name:'General Surgery',tier:'Low-cost',cost:10500}]},
-  {name:'Jaipur Eye & Ortho Institute', city:'Jaipur', address:'Tonk Road, Jaipur, Rajasthan – 302015', type:'Paid', beds:140, phone:'0141-234 9900', bloodbank:false,
-    diseases:[{name:'Eye Care / Cataract',tier:'Paid',cost:24000},{name:'Orthopedic',tier:'Paid',cost:82000}]},
-  {name:'Pune Mental Wellness & Rehab Centre', city:'Pune', address:'Senapati Bapat Road, Shivajinagar, Pune, Maharashtra – 411016', type:'Low-cost', beds:70, phone:'020-2345 9911', bloodbank:false,
-    diseases:[{name:'Mental Health',tier:'Low-cost',cost:3500}]},
-  {name:'Kokilaben Neuro & Multi-Speciality Hospital', city:'Mumbai', address:'Four Bungalows, Andheri West, Mumbai, Maharashtra – 400053', type:'Paid', beds:310, phone:'022-2345 7788', bloodbank:true,
-    diseases:[{name:'Neurology',tier:'Paid',cost:150000},{name:'Cardiac Care',tier:'Paid',cost:170000}]},
-  {name:'Vidyasagar Neuro Institute', city:'Kolkata', address:'Rashbehari Avenue, Kolkata, West Bengal – 700029', type:'Low-cost', beds:95, phone:'033-2345 6600', bloodbank:false,
-    diseases:[{name:'Neurology',tier:'Low-cost',cost:28000}]},
-  {name:'Smile Care Dental & Oral Health Centre', city:'Pune', address:'FC Road, Shivajinagar, Pune, Maharashtra – 411004', type:'Low-cost', beds:20, phone:'020-2345 1188', bloodbank:false,
-    diseases:[{name:'Dental Care',tier:'Low-cost',cost:1500}]},
-  {name:'Government Dental College Hospital', city:'Ahmedabad', address:'Civil Hospital Campus, Asarwa, Ahmedabad, Gujarat – 380016', type:'Free', beds:40, phone:'079-2345 2233', bloodbank:false,
-    diseases:[{name:'Dental Care',tier:'Free',cost:0}]},
-  {name:'Rainbow Children\'s Hospital', city:'Hyderabad', address:'Banjara Hills, Hyderabad, Telangana – 500034', type:'Paid', beds:180, phone:'040-2233 4400', bloodbank:true,
-    diseases:[{name:'Pediatric Care',tier:'Paid',cost:35000},{name:'Maternity',tier:'Paid',cost:60000}]},
-  {name:'Bal Kalyan Children\'s Welfare Hospital', city:'Lucknow', address:'Hazratganj, Lucknow, Uttar Pradesh – 226001', type:'Free', beds:120, phone:'0522-234 9900', bloodbank:true,
-    diseases:[{name:'Pediatric Care',tier:'Free',cost:0},{name:'TB Treatment',tier:'Free',cost:0}]},
-  {name:'Derma Care Skin & Hair Clinic Hospital', city:'Bengaluru', address:'Koramangala, Bengaluru, Karnataka – 560034', type:'Low-cost', beds:30, phone:'080-4455 2233', bloodbank:false,
-    diseases:[{name:'Skin Care / Dermatology',tier:'Low-cost',cost:2500}]},
-  {name:'City ENT & Speech Institute', city:'Chennai', address:'Nungambakkam, Chennai, Tamil Nadu – 600034', type:'Low-cost', beds:45, phone:'044-2345 7700', bloodbank:false,
-    diseases:[{name:'ENT Care',tier:'Low-cost',cost:6000}]},
-  {name:'Rajiv Gandhi ENT & General Hospital', city:'Delhi', address:'Rajouri Garden, New Delhi – 110027', type:'Free', beds:200, phone:'011-2345 6611', bloodbank:true,
-    diseases:[{name:'ENT Care',tier:'Free',cost:0},{name:'General Surgery',tier:'Free',cost:0}]},
-  {name:'Motherhood Women\'s & Gynecology Hospital', city:'Bengaluru', address:'Indiranagar, Bengaluru, Karnataka – 560038', type:'Paid', beds:90, phone:'080-4455 3300', bloodbank:false,
-    diseases:[{name:'Gynecology',tier:'Paid',cost:28000},{name:'Maternity',tier:'Paid',cost:45000}]},
-  {name:'District Women & Child Hospital', city:'Bhopal', address:'Jehangirabad, Bhopal, Madhya Pradesh – 462008', type:'Free', beds:180, phone:'0755-234 9911', bloodbank:true,
-    diseases:[{name:'Gynecology',tier:'Free',cost:0},{name:'Pediatric Care',tier:'Free',cost:0}]},
-  {name:'Urocare Kidney & Urology Centre', city:'Chandigarh', address:'Sector 22, Chandigarh – 160022', type:'Low-cost', beds:60, phone:'0172-234 8800', bloodbank:false,
-    diseases:[{name:'Urology',tier:'Low-cost',cost:9500},{name:'Kidney / Dialysis',tier:'Low-cost',cost:1300}]},
-  {name:'Liver & Digestive Care Institute', city:'Delhi', address:'Vasant Kunj, New Delhi – 110070', type:'Paid', beds:110, phone:'011-2345 9922', bloodbank:true,
-    diseases:[{name:'Liver Care',tier:'Paid',cost:120000}]},
-  {name:'Prana Chest & Respiratory Care Hospital', city:'Nagpur', address:'Sadar, Nagpur, Maharashtra – 440001', type:'Low-cost', beds:75, phone:'0712-234 7711', bloodbank:false,
-    diseases:[{name:'Respiratory Care',tier:'Low-cost',cost:4200},{name:'TB Treatment',tier:'Free',cost:0}]},
-  {name:'Sanjeevani Physiotherapy & Rehab Centre', city:'Kochi', address:'Kadavanthra, Kochi, Kerala – 682020', type:'Low-cost', beds:35, phone:'0484-234 8800', bloodbank:false,
-    diseases:[{name:'Physiotherapy & Rehab',tier:'Low-cost',cost:3000}]},
-];
-/* Unique list of diseases/conditions across all hospitals, used to build the
-   "Find affordable care for a condition" dropdown on the Hospitals page. */
-const DISEASES = [...new Set(HOSPITALS.flatMap(h=>h.diseases.map(d=>d.name)))].sort();
-/* Unique list of cities across all hospitals, used to build the "Location" dropdown
-   on the Hospitals page so users can filter by disease and/or location together. */
-const HOSPITAL_LOCATIONS = [...new Set(HOSPITALS.map(h=>h.city))].sort();
-
-const BLOOD_BANKS = [
-  {name:'Sunrise Govt Blood Bank', city:'Hyderabad', phone:'040-2244 5567', availability:'24x7', cost:'Free'},
-  {name:'Apex Community Blood Bank', city:'Chennai', phone:'044-3344 5567', availability:'24x7', cost:'Free'},
-  {name:'Rural Poor Welfare Blood Bank', city:'Lucknow', phone:'0522-234 5679', availability:'24x7', cost:'Free'},
-  {name:'Jan Arogya Blood Bank', city:'Jaipur', phone:'0141-234 5679', availability:'8am–10pm', cost:'Free'},
-  {name:'City Care Blood Bank', city:'Hyderabad', phone:'040-2233 4456', availability:'24x7', cost:'Low-cost'},
-  {name:'Prayas Trust Blood Bank', city:'Mumbai', phone:'022-2345 6790', availability:'24x7', cost:'Free'},
-  {name:'National Blood Bank', city:'Delhi', phone:'011-2345 6790', availability:'24x7', cost:'Low-cost'},
-  {name:'Metro Blood Bank', city:'Kolkata', phone:'033-2345 6790', availability:'24x7', cost:'Low-cost'},
-];
 const AMBULANCE = [
-  {name:'National Ambulance (Govt)', phone:'108', city:'All India', cost:'Free', response:'~15 min'},
-  {name:'Emergency Response Service', phone:'102', city:'All India (maternal & child)', cost:'Free', response:'~15 min'},
-  {name:'City Private Ambulance', phone:'1800-11-2233', city:'Hyderabad / Bengaluru', cost:'₹500–₹1,500', response:'~10 min'},
-  {name:'Prayas Charitable Ambulance', phone:'1800-22-3344', city:'Mumbai / Pune', cost:'Free / donation-based', response:'~12 min'},
-  {name:'MetroLife Ambulance Service', phone:'1800-33-4455', city:'Delhi / Kolkata', cost:'₹800–₹2,000', response:'~10 min'},
+  {name:'National Ambulance (Govt)', phone:'108', city:'All India', cost:'Free'},
+  {name:'Emergency Response Service', phone:'102', city:'All India (maternal & child)', cost:'Free'},
 ];
 
-const JOBS = [
-  {title:'Junior Data Entry Operator', org:'State Govt Secretariat', type:'Government', loc:'Delhi', deadline:'2026-08-10', skills:['data entry','typing','ms office','computer'], salary:'₹2.4–3 LPA'},
-  {title:'Bank Probationary Officer', org:'National Cooperative Bank', type:'Government', loc:'Multiple', deadline:'2026-08-20', skills:['banking','finance','graduate','customer service'], salary:'₹6–9 LPA'},
-  {title:'Frontend Developer (React)', org:'Nimbus Technologies', type:'Private', loc:'Remote', deadline:'2026-08-05', skills:['react','javascript','html','css','frontend'], salary:'₹8–14 LPA'},
-  {title:'Retail Store Associate', org:'MegaMart Retail', type:'Private', loc:'Mumbai', deadline:'2026-08-01', skills:['sales','retail','customer service','billing'], salary:'₹2–3.2 LPA'},
-  {title:'Junior Engineer (Civil)', org:'Public Works Department', type:'Government', loc:'Lucknow', deadline:'2026-09-01', skills:['civil engineering','autocad','site supervision'], salary:'₹4–6 LPA'},
-  {title:'Staff Nurse', org:'District Government Hospital', type:'Government', loc:'Hyderabad', deadline:'2026-08-15', skills:['nursing','patient care','gnm','bsc nursing'], salary:'₹3–4.5 LPA'},
-  {title:'School Teacher (Primary)', org:'State Education Department', type:'Government', loc:'Jaipur', deadline:'2026-08-25', skills:['teaching','b.ed','primary education'], salary:'₹3.5–5 LPA'},
-  {title:'Police Constable', org:'State Police Recruitment Board', type:'Government', loc:'Multiple', deadline:'2026-09-10', skills:['physical fitness','10th pass','discipline'], salary:'₹2.8–4 LPA'},
-  {title:'Delivery Executive', org:'QuickCart Logistics', type:'Private', loc:'Bengaluru', deadline:'2026-08-05', skills:['driving','two wheeler','delivery','navigation'], salary:'₹1.8–2.6 LPA'},
-  {title:'Security Guard', org:'SecureLine Facility Services', type:'Private', loc:'Pune', deadline:'2026-08-12', skills:['security','night shift','vigilance'], salary:'₹1.8–2.4 LPA'},
-  {title:'Accountant', org:'Sharma & Associates', type:'Private', loc:'Ahmedabad', deadline:'2026-08-18', skills:['accounting','tally','gst','excel'], salary:'₹3–5 LPA'},
-  {title:'Backend Developer (Node.js)', org:'Cloudberry Softwares', type:'Private', loc:'Remote', deadline:'2026-08-22', skills:['node.js','javascript','sql','backend','api'], salary:'₹9–16 LPA'},
-  {title:'Anganwadi Worker', org:'Ministry of Women & Child Development', type:'Government', loc:'Multiple', deadline:'2026-09-05', skills:['community work','child care','10th pass'], salary:'₹1.5–2.2 LPA'},
-  {title:'Electrician', org:'PowerGrid Maintenance Corp', type:'Government', loc:'Chennai', deadline:'2026-08-28', skills:['electrician','iti','wiring','maintenance'], salary:'₹2.4–3.6 LPA'},
-  {title:'Customer Support Executive', org:'Helpline Solutions', type:'Private', loc:'Kolkata', deadline:'2026-08-14', skills:['customer service','communication','call center'], salary:'₹2.2–3.2 LPA'},
-  {title:'Driver (Heavy Vehicle)', org:'State Road Transport Corporation', type:'Government', loc:'Multiple', deadline:'2026-09-02', skills:['driving','heavy vehicle license'], salary:'₹2.4–3.4 LPA'},
-  {title:'Junior Assistant (Clerical)', org:'District Collectorate Office', type:'Government', loc:'Bhopal', deadline:'2026-08-30', skills:['ms office','typing','file management','10th pass'], salary:'₹2.2–3 LPA'},
-  {title:'Lab Technician', org:'District Government Hospital', type:'Government', loc:'Kochi', deadline:'2026-08-20', skills:['lab technician','dmlt','pathology','sample testing'], salary:'₹2.6–3.8 LPA'},
-  {title:'Graphic Designer', org:'PixelCraft Studio', type:'Private', loc:'Remote', deadline:'2026-08-16', skills:['photoshop','illustrator','graphic design','branding'], salary:'₹4–7 LPA'},
-  {title:'Digital Marketing Executive', org:'BrightWave Media', type:'Private', loc:'Bengaluru', deadline:'2026-08-19', skills:['seo','social media','digital marketing','content'], salary:'₹3.5–6 LPA'},
-  {title:'Warehouse Associate', org:'SwiftLogix Supply Chain', type:'Private', loc:'Nagpur', deadline:'2026-08-08', skills:['warehouse','inventory','forklift','packing'], salary:'₹2–2.8 LPA'},
-  {title:'Hotel Front Desk Executive', org:'Grandview Hospitality Group', type:'Private', loc:'Guwahati', deadline:'2026-08-24', skills:['hospitality','front desk','customer service','communication'], salary:'₹2.4–3.4 LPA'},
-  {title:'Junior Software Tester (QA)', org:'Cloudberry Softwares', type:'Private', loc:'Remote', deadline:'2026-08-27', skills:['qa testing','manual testing','bug tracking','sql'], salary:'₹5–8 LPA'},
-  {title:'Forest Guard', org:'State Forest Department', type:'Government', loc:'Bhubaneswar', deadline:'2026-09-08', skills:['physical fitness','12th pass','field work'], salary:'₹2.2–3 LPA'},
-  {title:'Postal Assistant', org:'Department of Posts', type:'Government', loc:'Multiple', deadline:'2026-09-12', skills:['data entry','10th pass','customer service'], salary:'₹2.4–3.2 LPA'},
-  {title:'ITI Fitter', org:'State Industrial Corporation', type:'Government', loc:'Indore', deadline:'2026-08-29', skills:['fitter','iti','machine operation'], salary:'₹2.4–3.4 LPA'},
-  {title:'Content Writer', org:'WordSmith Media Pvt Ltd', type:'Private', loc:'Remote', deadline:'2026-08-13', skills:['content writing','seo','editing','research'], salary:'₹3–5.5 LPA'},
-  {title:'HR Executive', org:'Sharma & Associates', type:'Private', loc:'Ahmedabad', deadline:'2026-08-21', skills:['hr','recruitment','payroll','communication'], salary:'₹3.5–5.5 LPA'},
-  {title:'Field Sales Executive', org:'MegaMart Retail', type:'Private', loc:'Chandigarh', deadline:'2026-08-09', skills:['sales','field work','communication','target driven'], salary:'₹2.5–4 LPA'},
-  {title:'Junior Pharmacist', org:'District Government Hospital', type:'Government', loc:'Patna', deadline:'2026-08-17', skills:['pharmacy','d.pharm','b.pharm','patient care'], salary:'₹2.6–3.8 LPA'},
-  {title:'Android Developer', org:'Nimbus Technologies', type:'Private', loc:'Remote', deadline:'2026-08-23', skills:['android','kotlin','java','mobile development'], salary:'₹8–15 LPA'},
-  // ---- Added: skilled trades / blue-collar roles, spread across cities ----
-  {title:'Carpenter', org:'UrbanFix Home Services', type:'Private', loc:'Bengaluru', deadline:'2026-09-15', skills:['carpenter','carpentry','furniture','woodwork'], salary:'₹2.2–3.6 LPA'},
-  {title:'Carpenter', org:'HomeCraft Interiors', type:'Private', loc:'Mumbai', deadline:'2026-09-18', skills:['carpenter','carpentry','modular furniture','woodwork'], salary:'₹2.4–3.8 LPA'},
-  {title:'Carpenter', org:'BuildRight Contractors', type:'Private', loc:'Delhi', deadline:'2026-09-20', skills:['carpenter','carpentry','site work','furniture'], salary:'₹2.2–3.5 LPA'},
-  {title:'Carpenter', org:'WoodWorks Interiors', type:'Private', loc:'Pune', deadline:'2026-09-22', skills:['carpenter','carpentry','modular kitchen','woodwork'], salary:'₹2.3–3.6 LPA'},
-  {title:'Furniture Carpenter (Modular)', org:'Livspace Partner Network', type:'Private', loc:'Chennai', deadline:'2026-09-25', skills:['carpenter','carpentry','modular furniture','laminate work'], salary:'₹2.5–4 LPA'},
-  {title:'Plumber', org:'UrbanFix Home Services', type:'Private', loc:'Bengaluru', deadline:'2026-09-15', skills:['plumber','plumbing','pipe fitting','maintenance'], salary:'₹2.2–3.4 LPA'},
-  {title:'Plumber', org:'HomeCraft Interiors', type:'Private', loc:'Hyderabad', deadline:'2026-09-17', skills:['plumber','plumbing','pipe fitting'], salary:'₹2.2–3.4 LPA'},
-  {title:'Painter (Building)', org:'UrbanFix Home Services', type:'Private', loc:'Bengaluru', deadline:'2026-09-16', skills:['painter','painting','wall finishing','texture work'], salary:'₹2–3 LPA'},
-  {title:'Painter (Building)', org:'BuildRight Contractors', type:'Private', loc:'Mumbai', deadline:'2026-09-19', skills:['painter','painting','wall finishing'], salary:'₹2–3.2 LPA'},
-  {title:'Mason / Bricklayer', org:'BuildRight Contractors', type:'Private', loc:'Chennai', deadline:'2026-09-21', skills:['mason','masonry','bricklaying','construction'], salary:'₹2.2–3.4 LPA'},
-  {title:'Welder', org:'MetalCraft Fabricators', type:'Private', loc:'Pune', deadline:'2026-09-23', skills:['welder','welding','fabrication','iti'], salary:'₹2.6–4 LPA'},
-  {title:'AC / Refrigeration Technician', org:'CoolServe Technicians', type:'Private', loc:'Bengaluru', deadline:'2026-09-14', skills:['ac technician','refrigeration','hvac','repair'], salary:'₹2.6–4 LPA'},
-  {title:'AC / Refrigeration Technician', org:'CoolServe Technicians', type:'Private', loc:'Delhi', deadline:'2026-09-14', skills:['ac technician','refrigeration','hvac','repair'], salary:'₹2.6–4 LPA'},
-  {title:'Two-Wheeler Mechanic', org:'SpeedFix Auto Care', type:'Private', loc:'Bengaluru', deadline:'2026-09-13', skills:['mechanic','two wheeler','automobile repair','engine'], salary:'₹2.2–3.4 LPA'},
-  {title:'Car Mechanic', org:'SpeedFix Auto Care', type:'Private', loc:'Mumbai', deadline:'2026-09-13', skills:['mechanic','automobile repair','engine','car service'], salary:'₹2.6–4 LPA'},
-  {title:'Chef / Cook', org:'Grandview Hospitality Group', type:'Private', loc:'Bengaluru', deadline:'2026-09-11', skills:['cook','chef','kitchen','food preparation'], salary:'₹2.4–4 LPA'},
-  {title:'Chef / Cook', org:'Spice Route Restaurants', type:'Private', loc:'Delhi', deadline:'2026-09-11', skills:['cook','chef','kitchen','food preparation'], salary:'₹2.6–4.5 LPA'},
-  {title:'Tailor / Fashion Stitcher', org:'StyleStitch Garments', type:'Private', loc:'Mumbai', deadline:'2026-09-12', skills:['tailor','stitching','garment making','fashion'], salary:'₹2–3 LPA'},
-  {title:'Beautician / Salon Stylist', org:'GlowUp Salon Chain', type:'Private', loc:'Bengaluru', deadline:'2026-09-10', skills:['beautician','salon','hair styling','makeup'], salary:'₹2.2–3.6 LPA'},
-  {title:'Housekeeping Supervisor', org:'Grandview Hospitality Group', type:'Private', loc:'Chennai', deadline:'2026-09-09', skills:['housekeeping','supervision','hospitality'], salary:'₹2.2–3.2 LPA'},
-  {title:'Gardener / Landscaper', org:'GreenSpaces Facility Services', type:'Private', loc:'Bengaluru', deadline:'2026-09-08', skills:['gardening','landscaping','horticulture'], salary:'₹1.8–2.6 LPA'},
-  {title:'Cab Driver (App-based)', org:'RideEasy Mobility', type:'Private', loc:'Bengaluru', deadline:'2026-09-07', skills:['driving','cab','navigation','customer service'], salary:'₹2.5–4.5 LPA'},
-  {title:'Plumber', org:'FixIt Home Services', type:'Private', loc:'Chennai', deadline:'2026-09-17', skills:['plumber','plumbing','pipe fitting'], salary:'₹2.2–3.4 LPA'},
-  // ---- Added: more IT / software roles matching a Java + Spring Boot + Microservices profile, Bangalore-heavy ----
-  {title:'Java Developer (Spring Boot)', org:'Coreloop Systems', type:'Private', loc:'Bengaluru', deadline:'2026-09-10', skills:['java','spring boot','microservices','backend','sql'], salary:'₹14–22 LPA'},
-  {title:'Senior Java Developer', org:'Nimbus Technologies', type:'Private', loc:'Bengaluru', deadline:'2026-09-12', skills:['java','spring boot','microservices','system design','aws'], salary:'₹18–28 LPA'},
-  {title:'Java + Microservices Engineer', org:'Cloudberry Softwares', type:'Private', loc:'Bengaluru', deadline:'2026-09-14', skills:['java','microservices','spring boot','docker','kubernetes'], salary:'₹16–24 LPA'},
-  {title:'Backend Engineer (Java)', org:'FinEdge Technologies', type:'Private', loc:'Bengaluru', deadline:'2026-09-16', skills:['java','spring boot','rest api','microservices','mysql'], salary:'₹15–23 LPA'},
-  {title:'Java Developer (Spring Boot)', org:'Coreloop Systems', type:'Private', loc:'Hyderabad', deadline:'2026-09-10', skills:['java','spring boot','microservices','backend'], salary:'₹12–19 LPA'},
-  {title:'Java Developer (Spring Boot)', org:'Coreloop Systems', type:'Private', loc:'Pune', deadline:'2026-09-10', skills:['java','spring boot','microservices','backend'], salary:'₹12–19 LPA'},
-  {title:'Java Developer (Spring Boot)', org:'Coreloop Systems', type:'Private', loc:'Remote', deadline:'2026-09-10', skills:['java','spring boot','microservices','backend'], salary:'₹13–20 LPA'},
-  {title:'Java Developer — Full Stack', org:'Nimbus Technologies', type:'Private', loc:'Chennai', deadline:'2026-09-15', skills:['java','spring boot','react','microservices','sql'], salary:'₹13–20 LPA'},
-  {title:'DevOps Engineer', org:'Cloudberry Softwares', type:'Private', loc:'Bengaluru', deadline:'2026-09-18', skills:['devops','kubernetes','docker','aws','ci/cd'], salary:'₹15–24 LPA'},
-  {title:'Data Analyst', org:'InsightGrid Analytics', type:'Private', loc:'Bengaluru', deadline:'2026-09-19', skills:['sql','python','data analysis','excel','powerbi'], salary:'₹8–14 LPA'},
-  {title:'Product Manager (Fintech)', org:'FinEdge Technologies', type:'Private', loc:'Bengaluru', deadline:'2026-09-20', skills:['product management','agile','fintech','stakeholder management'], salary:'₹20–32 LPA'},
-  {title:'UI/UX Designer', org:'PixelCraft Studio', type:'Private', loc:'Bengaluru', deadline:'2026-09-21', skills:['ui design','ux design','figma','prototyping'], salary:'₹8–14 LPA'},
-  {title:'Cloud/AWS Engineer', org:'Cloudberry Softwares', type:'Private', loc:'Bengaluru', deadline:'2026-09-22', skills:['aws','cloud','devops','terraform'], salary:'₹16–26 LPA'},
-  {title:'Government Software Developer (IT Cell)', org:'State e-Governance Department', type:'Government', loc:'Bengaluru', deadline:'2026-09-23', skills:['java','sql','software development','government'], salary:'₹7–11 LPA'},
-];
 const SCHEMES = [
   {name:'PM Skill Development Yojana', dept:'Ministry of Skill Development', eligibility:'Age 18–35, unemployed youth', state:'All India', cat:'Employment'},
   {name:'Ayushman Bharat — Free Health Insurance', dept:'Ministry of Health', eligibility:'Below poverty line families, up to ₹5 lakh/year cover', state:'All India', cat:'Health'},
@@ -1292,9 +1102,6 @@ const SCHOLARSHIPS = [
   {name:'Tata Trusts Scholarship Programmes', provider:'Tata Trusts', type:'Private / Corporate', eligibility:'Meritorious students from low-income families pursuing higher education, varies by individual programme', howToApply:'Check current open programmes and apply via the Tata Trusts website', website:'https://www.tatatrusts.org'},
 ];
 const SCHOLARSHIP_TYPES = [...new Set(SCHOLARSHIPS.map(s=>s.type))].sort();
-const JOB_SKILLS = [...new Set(JOBS.flatMap(j=>j.skills||[]))].sort();
-const JOB_LOCATIONS = [...new Set(JOBS.map(j=>j.loc))].sort();
-const JOB_ROLES = [...new Set(JOBS.map(j=>j.title))].sort();
 function titleCaseWords(str){ return str.replace(/\b\w/g, c=>c.toUpperCase()); }
 const PLANS = [
   {name:'Free', price:0, period:'forever', features:['Basic AI preview (3/month)','Price comparison','Hospital & job search','Ads supported'], highlight:false},
@@ -2039,7 +1846,7 @@ const FEATURE_HIGHLIGHTS = [
   {label:'AR Try-On', desc:'See it in your space', icon:'cube', color:'#eb6834', route:'#/ar/p1'},
   {label:'Price Compare', desc:'6 stores, one tap', icon:'tag', color:'#1baf7a', route:'#/price-compare'},
   {label:'View in My Room', desc:'Place it in your space live', icon:'cube', color:'#4a3aa7', route:'#/room-ar/p1'},
-  {label:'Hospitals', desc:'Cheapest by condition', icon:'health', color:'#e34948', route:'#/hospitals'},
+  {label:'Hospitals', desc:'Emergency numbers & links', icon:'health', color:'#e34948', route:'#/hospitals'},
   {label:'Jobs & Resume', desc:'Govt + private listings', icon:'brief', color:'#eda100', route:'#/jobs'},
   {label:'Govt Schemes', desc:'Check your eligibility', icon:'doc', color:'#4a3aa7', route:'#/schemes'},
   {label:'Education & Colleges', desc:'Courses, entrance exams & fees', icon:'grad', color:'#1b8fa0', route:'#/education'},
@@ -3697,125 +3504,30 @@ function renderHospitals(){
   return `
   <div class="card" style="padding:18px;background:linear-gradient(120deg,var(--aqua),var(--brand));color:#fff">
     <h2 style="margin:0 0 4px">🏥 Hospitals &amp; Medical Help</h2>
-    <div style="font-size:13px;opacity:.92">Find free &amp; low-cost care, blood banks and ambulances near you — sorted by what's most affordable for your condition.</div>
+    <div style="font-size:13px;opacity:.92">Real national emergency numbers, plus direct links to India's official government hospital and blood bank directories.</div>
   </div>
   <div class="card" style="padding:16px;margin-top:14px;background:linear-gradient(160deg,color-mix(in srgb,var(--aqua) 10%,var(--surface)),color-mix(in srgb,var(--brand) 10%,var(--surface)))">
-    <b style="font-size:13px">💚 Find the most affordable hospital by condition and location</b>
-    <div class="grid filter-grid" style="grid-template-columns:1fr 1fr auto;gap:10px;margin-top:10px">
-      <select id="diseaseSelect" onchange="filterHospitals()">
-        <option value="">Any disease / condition</option>
-        ${DISEASES.map(d=>`<option value="${d}">${d}</option>`).join('')}
-      </select>
-      <select id="hospLocationSelect" onchange="filterHospitals()">
-        <option value="">Any location</option>
-        ${HOSPITAL_LOCATIONS.map(c=>`<option value="${c}">${c}</option>`).join('')}
-      </select>
-      <button class="btn secondary sm" onclick="document.getElementById('diseaseSelect').value='';document.getElementById('hospLocationSelect').value='';filterHospitals()">Show all hospitals</button>
+    <b style="font-size:13px">🚨 Emergency numbers (India, toll-free)</b>
+    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin-top:10px">
+      ${AMBULANCE.map(a=>`
+      <div class="card" style="padding:14px">
+        <div style="display:flex;justify-content:space-between"><b>🚑 ${a.name}</b><span class="pill" style="background:var(--good);color:#fff;border:none">Free</span></div>
+        <div style="font-size:13px;color:var(--text-secondary);margin-top:6px">📍 ${a.city}</div>
+        <a class="btn sm block" style="display:block;text-align:center;margin-top:8px" href="tel:${a.phone}">📞 Call ${a.phone}</a>
+      </div>`).join('')}
     </div>
-    <div style="font-size:12px;color:var(--text-secondary);font-weight:700;margin-top:10px">📝 Note: If you don't find a suitable hospital for your location, click "Show all hospitals" and go through the full hospital list.</div>
   </div>
-  <div class="tabs" style="margin-top:14px">
-    <button class="active" onclick="switchTab(this,'hospTab','list')">Hospitals (${HOSPITALS.length})</button>
-    <button onclick="switchTab(this,'hospTab','blood')">🩸 Blood Banks (${BLOOD_BANKS.length})</button>
-    <button onclick="switchTab(this,'hospTab','ambulance')">🚑 Ambulance (${AMBULANCE.length})</button>
+  <div class="card" style="padding:16px;margin-top:14px">
+    <b style="font-size:13px">🔎 Find a hospital or blood bank near you</b>
+    <div style="font-size:12.5px;color:var(--text-secondary);margin-top:6px">Howitlooks does not maintain its own hospital or blood bank database. Use these official, government-run directories for verified, up-to-date listings:</div>
+    <div class="btnrow" style="margin-top:10px">
+      <a class="btn sm" href="https://nha.gov.in/PM-JAY" target="_blank" rel="noopener">🏥 Ayushman Bharat (PM-JAY) hospitals →</a>
+      <a class="btn sm secondary" href="https://eraktkosh.mohfw.gov.in/BLDAHIMS/bloodbank/about.cnt" target="_blank" rel="noopener">🩸 e-RaktKosh blood banks →</a>
+      <a class="btn sm secondary" href="https://www.google.com/maps/search/government+hospital+near+me" target="_blank" rel="noopener">📍 Hospitals near me (Maps) →</a>
+    </div>
   </div>
-  <div id="hospTab">${hospList()}</div>
-  <div class="disclaimer">Costs shown are indicative averages for demo purposes and vary by treatment complexity, hospital and city — always confirm directly with the hospital. In a medical emergency, call 108 (or 102 for maternal/child emergencies) immediately.</div>
+  <div class="disclaimer">Howitlooks is not a hospital, blood bank, ambulance service, or government agency, and does not verify or guarantee information on the third-party sites linked above. The numbers listed are India's publicly published national emergency helplines. In a medical emergency, call 108 (or 102 for maternal/child emergencies) immediately.</div>
   `;
-}
-function hospCard(h, highlightDisease){
-  const match = highlightDisease ? h.diseases.find(d=>d.name===highlightDisease) : null;
-  const tierColor = t => t==='Free' ? 'var(--good)' : t==='Low-cost' ? 'var(--accent)' : 'var(--violet)';
-  const telHref = 'tel:' + h.phone.replace(/[^0-9+]/g,'');
-  const specialtyPills = h.diseases.map(d=>{
-    const c = tierColor(d.tier);
-    const isMatch = highlightDisease && d.name===highlightDisease;
-    return `<span style="display:inline-block;font-size:10.5px;font-weight:700;padding:3px 8px;border-radius:20px;background:color-mix(in srgb, ${c} 15%, var(--surface));color:${c};border:1px solid color-mix(in srgb, ${c} 45%, transparent);${isMatch?'box-shadow:0 0 0 2px '+c+';':''}">${d.name}${d.tier==='Free'?' · Free':' · ~'+fmt(d.cost)}</span>`;
-  }).join('');
-  return `
-    <div class="card" style="padding:14px${match&&match.tier==='Free'?';border:2px solid var(--good)':''}">
-      <div style="display:flex;justify-content:space-between;gap:8px"><b>${h.name}</b><span class="pill" style="background:${tierColor(h.type)};color:#fff;border:none;flex-shrink:0">${h.type}</span></div>
-      <div style="font-size:13px;color:var(--text-secondary);margin-top:6px">📍 ${h.address || h.city} · 🛏️ ${h.beds} beds</div>
-      <div style="font-size:13px;margin-top:4px"><a href="${telHref}" style="color:inherit;text-decoration:underline" title="Tap to call">📞 ${h.phone}</a> ${h.bloodbank?'· 🩸 Blood bank on-site':''}</div>
-      ${match ? `<div style="font-size:12px;margin-top:8px;padding:6px 8px;border-radius:8px;background:var(--surface-2)"><b>${match.tier==='Free'?'💚 Free':'💰 ~'+fmt(match.cost)}</b> for ${match.name}${match.tier==='Free'?' — most affordable match':''}</div>` : ''}
-      <div style="margin-top:9px">
-        <div style="font-size:10.5px;font-weight:800;letter-spacing:.4px;color:var(--muted)">SPECIALIZES IN</div>
-        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-top:5px">${specialtyPills}</div>
-      </div>
-    </div>`;
-}
-function hospList(){
-  return `<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(270px,1fr))">
-    ${HOSPITALS.map(h=>hospCard(h)).join('')}
-  </div>`;
-}
-function filterHospitals(){
-  const disease = document.getElementById('diseaseSelect').value;
-  const location = document.getElementById('hospLocationSelect').value;
-  const el = document.getElementById('hospTab');
-  document.querySelectorAll('.tabs button').forEach(b=>b.classList.remove('active'));
-  const listTabBtn = document.querySelector('.tabs button');
-  if(listTabBtn) listTabBtn.classList.add('active');
-
-  if(!disease && !location){ el.innerHTML = hospList(); return; }
-
-  const sortByDisease = (list, d)=> d ? list.slice().sort((a,b)=>{
-    const ca = a.diseases.find(x=>x.name===d).cost, cb = b.diseases.find(x=>x.name===d).cost;
-    return ca-cb;
-  }) : list;
-
-  let matches = HOSPITALS.filter(h=>
-    (!disease || h.diseases.some(d=>d.name===disease)) &&
-    (!location || h.city===location)
-  );
-  matches = sortByDisease(matches, disease);
-
-  let title;
-  if(disease && location) title = `Cheapest first for "${disease}" in ${location}`;
-  else if(disease) title = `Cheapest first for "${disease}"`;
-  else title = `Hospitals in ${location}`;
-
-  // Strictly respect BOTH filters — never silently swap in hospitals from a different
-  // city, since that reads as a broken location filter. If the combo has zero matches,
-  // show a clear empty state with an explicit opt-in button to widen the search.
-  if(matches.length===0 && disease && location){
-    el.innerHTML = `
-      <div class="section-title" style="margin-top:0"><h3 style="margin:0">${title}</h3><span class="pill">0 found</span></div>
-      <div class="card" style="padding:24px;text-align:center">
-        <div style="font-size:14px;margin-bottom:12px">No "${disease}" hospitals found in ${location}.</div>
-        <button class="btn secondary sm" onclick="document.getElementById('hospLocationSelect').value='';filterHospitals()">Show "${disease}" hospitals in other cities →</button>
-      </div>
-    `;
-    return;
-  }
-
-  el.innerHTML = `
-    <div class="section-title" style="margin-top:0"><h3 style="margin:0">${title}</h3><span class="pill">${matches.length} found</span></div>
-    <div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(270px,1fr))">${matches.map(h=>hospCard(h, disease)).join('')}</div>
-  `;
-}
-function switchTab(btn, containerId, tab){
-  btn.parentElement.querySelectorAll('button').forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  const el = document.getElementById(containerId);
-  if(containerId==='hospTab'){
-    if(tab==='list') el.innerHTML = hospList();
-    else if(tab==='blood') el.innerHTML = `<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(270px,1fr))">${BLOOD_BANKS.map(b=>`
-      <div class="card" style="padding:14px">
-        <div style="display:flex;justify-content:space-between"><b>🩸 ${b.name}</b><span class="pill" style="background:${b.cost==='Free'?'var(--good)':'var(--accent)'};color:#fff;border:none">${b.cost}</span></div>
-        <div style="font-size:13px;color:var(--text-secondary);margin-top:6px">📍 ${b.city} · 🕐 ${b.availability}</div>
-        <div style="font-size:13px;margin-top:4px">📞 ${b.phone}</div>
-      </div>`).join('')}</div>`;
-    else el.innerHTML = `<div class="grid" style="grid-template-columns:repeat(auto-fill,minmax(270px,1fr))">${AMBULANCE.map(a=>`
-      <div class="card" style="padding:14px">
-        <div style="display:flex;justify-content:space-between"><b>🚑 ${a.name}</b><span class="pill" style="background:${a.cost==='Free'?'var(--good)':'var(--accent)'};color:#fff;border:none">${a.cost}</span></div>
-        <div style="font-size:13px;color:var(--text-secondary);margin-top:6px">📍 ${a.city} · ⏱️ ${a.response}</div>
-        <div style="font-size:13px;margin-top:4px">📞 Call ${a.phone}</div>
-      </div>`).join('')}</div>`;
-  } else if(containerId==='jobsTab'){
-    const filtered = tab==='all' ? JOBS : JOBS.filter(j=>j.type===tab);
-    el.innerHTML = jobList(filtered);
-  }
 }
 // Jobs page opens pre-filtered to Bengaluru by default (per request: "give
 // me first from bangalore later from all india") — state.jobLocFilter holds
@@ -3869,6 +3581,7 @@ function renderJobs(){
     <button onclick="switchJobsTab(this,'Private')">Private</button>
   </div>
   <div id="jobsTab"><div class="empty-state">Loading live jobs…</div></div>
+  <div class="disclaimer">Howitlooks is not a government agency, recruiter, or employer, and does not process applications or guarantee any job placement. Listings are pulled live from public job search data, and the "Apply" button takes you to the original posting — always verify details directly with the listing organization before applying.</div>
   <div class="section-title"><h2>📝 Resume Builder</h2></div>
   ${resumeBuilder()}
   `;
@@ -4832,7 +4545,7 @@ function renderSchemes(){
   <div id="schemesTab" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));margin-top:14px">
   ${SCHEMES.map(schemeCard).join('')}
   </div>
-  <div class="disclaimer">Scheme names, eligibility and coverage shown are illustrative summaries for demo purposes — always verify current details on the official government portal before applying.</div>
+  <div class="disclaimer">Howitlooks is not a government agency and is not affiliated with, endorsed by, or acting on behalf of any ministry or department named above. Scheme names and eligibility shown are summaries only — always verify current details and apply directly on the official government portal (linked via "View details") before relying on this information.</div>
   `;
 }
 function filterSchemes(btn, cat){
@@ -4884,7 +4597,7 @@ function renderCollegesSection(){
   <div id="educationTab" class="grid" style="grid-template-columns:repeat(auto-fill,minmax(280px,1fr));margin-top:14px">
   ${COLLEGES.map(collegeCard).join('')}
   </div>
-  <div class="disclaimer">College names are real institutions, but entrance-exam, hostel and fee details shown are illustrative summaries for demo purposes — always verify current cut-offs, seats and fee structure on the official website (linked via "View details") before applying.</div>
+  <div class="disclaimer">Howitlooks is not affiliated with, endorsed by, or acting on behalf of any institution listed above. College names are real institutions, but entrance-exam, hostel and fee details shown are approximate summaries — always verify current cut-offs, seats and fee structure on the official website (linked via "View details") before applying.</div>
   `;
 }
 function filterEducation(btn){
